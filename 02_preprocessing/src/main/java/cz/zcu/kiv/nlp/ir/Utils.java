@@ -1,12 +1,10 @@
 package cz.zcu.kiv.nlp.ir;
 
 import java.io.*;
-import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Utils for I/O operations

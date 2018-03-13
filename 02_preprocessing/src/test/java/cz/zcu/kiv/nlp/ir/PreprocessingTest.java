@@ -1,5 +1,8 @@
 package cz.zcu.kiv.nlp.ir;
 
+import cz.zcu.kiv.nlp.vs.DataLoader;
+import cz.zcu.kiv.nlp.vs.Post;
+import cz.zcu.kiv.nlp.vs.Record;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,6 +18,9 @@ import static org.junit.Assert.*;
  * User: tigi
  * Date: 6.12.12
  * Time: 9:06
+ *
+ * @author Radek Vais
+ * @version 8.3.2018
  */
 public class PreprocessingTest {
 
@@ -40,7 +46,7 @@ public class PreprocessingTest {
 
         boolean removeAccentsBeforeStemming = false;
         preprocessing = new BasicPreprocessing(
-                new CzechStemmerAgressive(), new AdvancedTokenizer(), new StopWordManager(removeAccentsBeforeStemming).getStopWords(), removeAccentsBeforeStemming, true, true
+          new CzechStemmerAgressive(), new AdvancedTokenizer(), new StopWordManager(removeAccentsBeforeStemming).getStopWords(), removeAccentsBeforeStemming, true, true
         );
     }
 
@@ -230,12 +236,47 @@ public class PreprocessingTest {
     @Test
     public void testYourData() throws Exception {
         createNewInstance();
+        DataLoader dataLoader = new DataLoader();
+        dataLoader.loadFile();
 
-
-        //todo zaindexujte vaše data a vytvořte testy na přítomnost nesmyslných slov, která se vyskytla ve vašem slovníku (a opravte)
-
+        for (Record rec: dataLoader.getDocuments()) {
+            for(Post post: rec.getPosts()) {
+                preprocessing.index(post.getContent());
+            }
+        }
         final Map<String, Integer> wordFrequencies = preprocessing.getWordFrequencies();
         printWordFrequencies(wordFrequencies);
 
+        assertEquals( 3 , wordFrequencies.get(preprocessing.getProcessedForm("300 Kč")).intValue() );
+        assertEquals( 1, wordFrequencies.get(preprocessing.getProcessedForm("475 205 146")).intValue());
+    }
+
+    @Test
+    public void testPhoneNumbers() throws Exception {
+        createNewInstance();
+
+        preprocessing.index("730 556 223");
+        preprocessing.index("+420 730 556 223");
+
+        final Map<String, Integer> wordFrequencies = preprocessing.getWordFrequencies();
+        printWordFrequencies(wordFrequencies);
+        assertEquals( 1, wordFrequencies.get(preprocessing.getProcessedForm("730 556 223")).intValue());
+        assertEquals( 1, wordFrequencies.get(preprocessing.getProcessedForm("+420 730 556 223")).intValue());
+    }
+
+    @Test
+    public void testCurrency() throws Exception {
+        createNewInstance();
+
+        preprocessing.index("1 000Kč");
+        preprocessing.index("1 000kč");
+        preprocessing.index("1 000Kc");
+        preprocessing.index("1 000kc");
+        preprocessing.index("1 000 000 Kč");
+
+        final Map<String, Integer> wordFrequencies = preprocessing.getWordFrequencies();
+        printWordFrequencies(wordFrequencies);
+        assertEquals( 4, wordFrequencies.get(preprocessing.getProcessedForm("1 000Kč")).intValue());
+        assertEquals( 1, wordFrequencies.get(preprocessing.getProcessedForm("1 000 000 Kč")).intValue());
     }
 }

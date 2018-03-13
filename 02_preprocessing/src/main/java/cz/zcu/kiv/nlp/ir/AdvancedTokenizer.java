@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michal Konkol
+ *
+ * @author Radek Vais
+ * @version 27.3.2018
  */
 public class AdvancedTokenizer implements Tokenizer {
     //cislo |  | html | tecky a sracky
@@ -23,9 +26,12 @@ public class AdvancedTokenizer implements Tokenizer {
     //private static final String squareRegex = numberRegex+"x"+numberRegex;
     private static final String antiFuckRegex = "([\\p{L}\\w*]+)";
     private static final String httpRegex = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-
+    private static final String currencyRegex = "((([\\d]{1,3})+ *)+(kc|Kc|Kč|kč|CZK))";
+    private static final String phoneRegex = "(\\+{0,1}(([\\d]{3}) {0,1}){3,4})";
     public static final String defaultRegex = httpRegex + "|"
                                             + dateRegex + "|"
+                                            + currencyRegex + "|"
+                                            + phoneRegex + "|"
                                             + decimalRegex + "|"
                                             + antiFuckRegex + "|"
                                             + htmlRegex + "|"

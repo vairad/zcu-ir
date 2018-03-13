@@ -1,10 +1,6 @@
 package cz.zcu.kiv.nlp.ir;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -42,7 +38,7 @@ public class BasicPreprocessingExample {
 
         System.out.println();
 
-        final ArrayList<String> documents = new ArrayList<String>();
+        final ArrayList<String> documents = new ArrayList<>();
         for (String document : split(text, "\n")) {
             documents.add(document);
         }
