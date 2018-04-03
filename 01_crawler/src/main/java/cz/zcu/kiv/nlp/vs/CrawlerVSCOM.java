@@ -28,8 +28,8 @@ public class CrawlerVSCOM {
      */
     private final static Map<String, String> xpathMap = new HashMap<String, String>();
 
-    private static final int MAX_PAGES_COUNT = 600;
-    private static final String DATE_TIME_FORMAT = "d.M.YYYY";
+    private static final int MAX_PAGES_COUNT = 500;
+    private static final String DATE_TIME_FORMAT = "d.M.y";
     private static final String DATA_FILE_PATTERN = "Records.ser";
     private static DownloaderType DownloaderSwitch = BASIC;
 
