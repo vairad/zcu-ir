@@ -1,4 +1,8 @@
-/*idea*/
+*/*idea*/
 *.iml
-/target/
-/odevzdani/
+*/target/
+*/odevzdani/
+*/storage/
+*/bin/
+*/data/
+
