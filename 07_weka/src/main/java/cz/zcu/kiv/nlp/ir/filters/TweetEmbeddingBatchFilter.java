@@ -55,13 +55,14 @@ public class TweetEmbeddingBatchFilter extends SimpleBatchFilter{
 
         //create dictionary only for first time
         if (!this.isFirstBatchDone()) {
-
-            //TODO load and init word vector map
+            embeddingLoader.createWordMap();
+            //TODO DONE load and init word vector map
         }
         
         //Add new attributes
         int dimension = embeddingLoader.getDimension();
         for (int i = 0; i < dimension; i++) {
+            att.add(embeddingLoader.)
             //TODO
         }
 
