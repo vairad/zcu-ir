@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="pFormat">[%level - %class{1}.%method()] - %msg%n</Property>
+
+		<Property name="suffix">.log</Property>
+
+		<Property name="projectName">MilostnyDopisClient</Property>
+
+		<Property name="baseLog">${projectName}${suffix}</Property> <!-- Jen do úrovně  INFO-->
+		<Property name="debugLog">${projectName}-debug${suffix}</Property> <!-- Jen do úrovně  DEBUG-->
+		<Property name="traceLog">${projectName}-trace${suffix}</Property> <!-- Jen do úrovně  ALL -->
+
+		<Property name="sendMessages">${projectName}-send${suffix}</Property>
+		<Property name="receivedMessages">${projectName}-receive${suffix}</Property>
+		<Property name="messages">${projectName}-allMessages${suffix}</Property>
+
+		<Property name="xml-parser">${projectName}-xmlParser${suffix}</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="screen" target="SYSTEM_OUT">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+		</Console>
+
+	<!--	<File name="file" filename="${baseLog}" append="true">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-debug" filename="${debugLog}" append="true">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-all" filename="${traceLog}" append="true">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-send-messages" filename="${sendMessages}" append="false">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-received-messages" filename="${receivedMessages}" append="false">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-messages" filename="${messages}" append="false">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+		</File>
+
+		<File name="file-xml-parser" filename="${xml-parser}" append="false">
+			<PatternLayout pattern="${pFormat}" />
+			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+		</File> -->
+
+	</Appenders>
+	<Loggers>
+
+		<Root level="ALL">
+			<AppenderRef ref="screen"/>
+			<AppenderRef ref="file"/>
+			<AppenderRef ref="file-debug"/>
+			<AppenderRef ref="file-all"/>
+		</Root>
+
+
+		<Logger name="cz.zcu.kiv.nlp.ir.trec.gui.Localization" level="ALL">
+			<AppenderRef ref="file-send-messages"/>
+			<AppenderRef ref="file-messages"/>
+		</Logger>
+
+		<Logger name="netservice.Receiver" level="ALL">
+			<AppenderRef ref="file-received-messages"/>
+			<AppenderRef ref="file-messages"/>
+		</Logger>
+
+		<Logger name="game.GameStatus" level="ALL">
+			<AppenderRef ref="file-xml-parser"/>
+		</Logger>
+
+	</Loggers>
+</Configuration>
