@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.*;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -21,30 +22,18 @@ import java.util.*;
 
 public class TestTrecEval {
 
-    static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
-    static final String OUTPUT_DIR = "./TREC";
-
-    protected static void configureLogger() {
-  //      BasicConfigurator.resetConfiguration();
-    //    BasicConfigurator.configure();
-
-      //  File results = new File(OUTPUT_DIR);
-        //if (!results.exists()) {
-          //  results.mkdir();
-        //}
-
-      //  try {
-        //    Appender appender = new WriterAppender(new PatternLayout(), new FileOutputStream(new File(OUTPUT_DIR + "/" + SerializedDataHelper.SDF.format(System.currentTimeMillis()) + " - " + ".log"), false));
-          //  BasicConfigurator.configure(appender);
-  //      } catch (IOException e) {
-    //        e.printStackTrace();
-      //  }
-
-        //Logger.getRootLogger().setLevel(Level.INFO);
+    /*Statický inicializační blok nastavující odkaz (proměnnou) na konfiguraci loggeru*/
+    static{
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_SS");
+        System.setProperty("current.date.time", dateFormat.format(new Date()));
+        System.setProperty("output.dir", TestTrecEval.OUTPUT_DIR);
+        System.setProperty("log4j.configurationFile", "log-conf.xml");
     }
+    static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
+
+    private static final String OUTPUT_DIR = "TREC";
 
     public static void main(String args[]) throws IOException {
-        configureLogger();
 
 //        todo constructor
         Index index = new Index();
@@ -62,10 +51,10 @@ public class TestTrecEval {
                 log.error("Cannot find " + serializedData);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error loading data", e);
+            System.exit(55);
         }
         log.info("Documents: " + documents.size());
-
 
         List<String> lines = new ArrayList<String>();
 
