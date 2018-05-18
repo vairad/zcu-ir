@@ -4,6 +4,9 @@
  */
 package cz.zcu.kiv.nlp.ir.trec.preprocessing;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +18,10 @@ import java.util.regex.Pattern;
  * @version 27.3.2018
  */
 public class AdvancedTokenizer implements ITokenizer {
+
+    /** instance loggeru */
+    static Logger logger = LogManager.getLogger(AdvancedTokenizer.class.getName());
+
     //cislo |  | html | tecky a sracky
 
     private static final String decimalRegex = "(\\d+[.,](\\d+)?)";

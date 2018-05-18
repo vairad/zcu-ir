@@ -14,7 +14,8 @@ import java.util.List;
  */
 public class SerializedDataHelper {
 
-    static Logger log = LogManager.getLogger(SerializedDataHelper.class.getName());
+    /** instance loggeru */
+    static Logger logger = LogManager.getLogger(SerializedDataHelper.class.getName());
 
     static final java.text.DateFormat SDF = new SimpleDateFormat("yyyy-MM-dd_HH_mm_SS");
 
@@ -44,7 +45,7 @@ public class SerializedDataHelper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        log.info("Data saved to " + outputFile.getPath());
+        logger.info("Data saved to " + outputFile.getPath());
     }
 
     static public List<Topic> loadTopic(File serializedFile) {
@@ -72,6 +73,6 @@ public class SerializedDataHelper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        log.info("Data saved to " + outputFile.getPath());
+        logger.info("Data saved to " + outputFile.getPath());
     }
 }

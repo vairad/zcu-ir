@@ -2,6 +2,9 @@ package cz.zcu.kiv.nlp.ir.trec;
 
 import cz.zcu.kiv.nlp.ir.trec.data.Document;
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
+import cz.zcu.kiv.nlp.ir.trec.preprocessing.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -10,6 +13,9 @@ import java.util.List;
  */
 
 public class Index implements Indexer, Searcher {
+
+    /** instance loggeru */
+    private static Logger logger = LogManager.getLogger(Index.class.getName());
 
     public void index(List<Document> documents) {
         //  todo implement
