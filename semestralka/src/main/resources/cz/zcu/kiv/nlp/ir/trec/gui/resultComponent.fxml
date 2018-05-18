@@ -3,12 +3,18 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Separator?>
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml" alignment="CENTER" >
-  <VBox>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml"
+         alignment="CENTER"
+         maxHeight="-Infinity"
+         maxWidth="-Infinity"
+         minHeight="-Infinity"
+         minWidth="-Infinity"
+         spacing="8.0">
+
         <Label fx:id="documentName"   styleClass="title"/>
         <Label fx:id="presentQuery" styleClass="presentWords"/>
         <Label fx:id="missingQuery" styleClass="missingWords"/>
         <Label fx:id="preview" styleClass="preview"/>
-        <Separator/>
-  </VBox>
+        <Separator />
 </fx:root>

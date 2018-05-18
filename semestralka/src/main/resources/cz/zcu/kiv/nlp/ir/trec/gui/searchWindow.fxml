@@ -7,19 +7,25 @@
 <?import javafx.scene.control.ScrollPane?>
 <BorderPane id="BorderPane" prefHeight="100.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml" fx:controller="cz.zcu.kiv.nlp.ir.trec.gui.SearchControler">
   <top>
-    <HBox spacing="8.0" alignment="CENTER">
-      <children>
-          <TextField fx:id="field" prefWidth="200.0" />
-          <Button fx:id="button" onAction="#handleAction" text="Submit" />
-        </children>
-      </HBox>
+    <VBox>
+        <HBox spacing="8.0" alignment="CENTER">
+            <children>
+                <TextField fx:id="field" prefWidth="200.0" />
+                <Button fx:id="button" onAction="#handleAction" text="Submit" />
+            </children>
+        </HBox>
+        <HBox>
+            <Label alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0">
+              Výsledky pro dotaz:
+            </Label>
+            <Label fx:id="query" alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
+        </HBox>
+    </VBox>
   </top>
   <center>
-    <Label fx:id="query" alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
-        <ScrollPane>
-            <VBox fx:id="results" alignment="CENTER">
-            </VBox>
-        </ScrollPane>
+     <ScrollPane>
+        <VBox fx:id="results" />
+    </ScrollPane>
   </center>
 </BorderPane>
 
