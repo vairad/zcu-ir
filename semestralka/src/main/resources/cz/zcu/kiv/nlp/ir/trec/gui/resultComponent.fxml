@@ -2,10 +2,13 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
+<?import javafx.scene.control.Separator?>
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml" alignment="CENTER" >
   <VBox>
-    <Label fx:id="documentName"/>
-    <Label fx:id="presentQuery"/>
-    <Label fx:id="preview"/>
+        <Label fx:id="documentName"   styleClass="title"/>
+        <Label fx:id="presentQuery" styleClass="presentWords"/>
+        <Label fx:id="missingQuery" styleClass="missingWords"/>
+        <Label fx:id="preview" styleClass="preview"/>
+        <Separator/>
   </VBox>
 </fx:root>

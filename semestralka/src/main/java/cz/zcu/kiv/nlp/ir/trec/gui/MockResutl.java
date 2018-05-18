@@ -12,6 +12,11 @@ public class MockResutl implements IGuiResult {
     }
 
     @Override
+    public String getMissingQuery() {
+        return "TOhle cybí";
+    }
+
+    @Override
     public String getPrewiev() {
         return "Asi nějaký cool dokument";
     }

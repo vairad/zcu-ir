@@ -4,6 +4,7 @@ public interface IGuiResult {
 
     String getDocumentName();
     String getPresentQuery();
+    String getMissingQuery();
     String getPrewiev();
 
 }
