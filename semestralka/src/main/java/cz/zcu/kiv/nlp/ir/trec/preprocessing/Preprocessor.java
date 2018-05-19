@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Instance preprocessingu, která vyžaduje ke korektnímu fungování tokenizér.
+ * Preprocessing převede text na lower case a odstrní diakritiku.
  * Preprocesing provede nejdříve tokenizaci a na tokeny aplikuje stemming.
  *
  * @author Radek Vais
@@ -44,10 +45,20 @@ public class Preprocessor implements IPreprocessor {
             throw new IllegalStateException("Tokenizer was not set.");
         }
 
+        logger.trace("To lower case");
+        sentence = sentence.toLowerCase();
+
+        logger.trace("Remove accents");
+        sentence = Utils.removeAccents(sentence);
+
+        logger.trace("Trim");
+        sentence = sentence.trim();
+
+        logger.trace("Tokenize");
         List<String> tokens = tokenizer.getTokens(sentence);
 
         if(stemmer != null){
-            logger.debug("Steming");
+            logger.trace("Steming");
             List<String> stemmed = new ArrayList<>(tokens.size());
             for (String token: tokens) {
                 stemmed.add(stemmer.stem(token));
@@ -56,5 +67,10 @@ public class Preprocessor implements IPreprocessor {
         }
         logger.trace("End method");
         return tokens;
+    }
+
+    @Override
+    public String toString(){
+        return "Preprocessor";
     }
 }
