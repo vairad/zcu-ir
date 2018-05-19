@@ -35,11 +35,14 @@ public class TestTrecEval {
 
     public static void main(String args[]) {
 
-//        todo constructor
         IPreprocessor preprocessor = new Preprocessor();
 
+        String [] stopFiles = {"stop-cz-dia-1.txt",
+                                "stop-spec-chars.txt"};
+        IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
+
         IStemmer stemmer = new CzechStemmerAgressive();
-        ITokenizer tokenizer = new AdvancedTokenizer(null);
+        ITokenizer tokenizer = new AdvancedTokenizer(stopWords);
 
         preprocessor.initialise(stemmer, tokenizer);
         Index index = new Index(preprocessor);
@@ -72,6 +75,8 @@ public class TestTrecEval {
             index.index(documents);
             index.dumpIndex("indexFile.idx");
         }
+
+        log.info("Indexing done");
 
         List<String> lines = new ArrayList<>();
 

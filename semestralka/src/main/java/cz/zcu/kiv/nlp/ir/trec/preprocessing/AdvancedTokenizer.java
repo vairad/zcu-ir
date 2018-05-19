@@ -76,7 +76,7 @@ public class AdvancedTokenizer implements ITokenizer {
         logger.trace("Entry method");
         List<String> results = tokenize(text, defaultRegex);
         if(stopwords != null){
-            logger.debug("Removing stopwords");
+            logger.trace("Removing stopwords");
             for (String result: results) {
                 if(stopwords.isPresent(result)){
                     results.remove(result);

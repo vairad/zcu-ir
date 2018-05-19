@@ -12,6 +12,7 @@ import java.util.Set;
 
 
 /**
+ * Instance slovníku, který odstraňuje diaktiku a převádí slova na lowercase.
  * @author Radek Vais
  */
 public class FileDictionary implements IDictionary {
@@ -26,14 +27,18 @@ public class FileDictionary implements IDictionary {
      * Konstruktor otevře postupně celý seznam souborů předaných jako parametr a uloži je do množiny.
      * @param filesToLoad seznam souborů k načtení.
      */
-    FileDictionary(List<String> filesToLoad){
+    public FileDictionary(List<String> filesToLoad){
         logger.trace("Start method.");
         dictionary = new HashSet<String>();
 
         for (String fileName: filesToLoad) {
             try {
                 List<String> words = Utils.readTXTFile(new FileInputStream( new File(fileName)));
-                dictionary.addAll(words);
+                for (String word: words) {
+                    word = word.toLowerCase();
+                    word = Utils.removeAccents(word);
+                    dictionary.add(word);
+                }
             } catch (FileNotFoundException e) {
                 logger.warn("File "+fileName+" was not found.");
             }
