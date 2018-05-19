@@ -1,59 +1,57 @@
 package cz.zcu.kiv.nlp.ir.trec;
 
-import cz.zcu.kiv.nlp.ir.trec.data.*;
+import cz.zcu.kiv.nlp.ir.trec.data.Document;
+import cz.zcu.kiv.nlp.ir.trec.data.Result;
+import cz.zcu.kiv.nlp.ir.trec.data.Topic;
+import cz.zcu.kiv.nlp.ir.trec.preprocessing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.*;
-import java.text.ParseException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
 /**
  * @author tigi
+ * @author Radek Vais
  */
 
 public class TestTrecEval {
 
-    static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
-    static final String OUTPUT_DIR = "./TREC";
-
-    protected static void configureLogger() {
-  //      BasicConfigurator.resetConfiguration();
-    //    BasicConfigurator.configure();
-
-      //  File results = new File(OUTPUT_DIR);
-        //if (!results.exists()) {
-          //  results.mkdir();
-        //}
-
-      //  try {
-        //    Appender appender = new WriterAppender(new PatternLayout(), new FileOutputStream(new File(OUTPUT_DIR + "/" + SerializedDataHelper.SDF.format(System.currentTimeMillis()) + " - " + ".log"), false));
-          //  BasicConfigurator.configure(appender);
-  //      } catch (IOException e) {
-    //        e.printStackTrace();
-      //  }
-
-        //Logger.getRootLogger().setLevel(Level.INFO);
+    /*Statický inicializační blok nastavující odkaz (proměnnou) na konfiguraci loggeru*/
+    static{
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_SS");
+        System.setProperty("current.date.time", dateFormat.format(new Date()));
+        System.setProperty("output.dir", TestTrecEval.OUTPUT_DIR);
+        System.setProperty("log4j.configurationFile", "log-conf.xml");
     }
+    private static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
 
-    public static void main(String args[]) throws IOException {
-        configureLogger();
+    private static final String OUTPUT_DIR = "TREC";
 
-//        todo constructor
-        Index index = new Index();
+    public static void main(String args[]) {
+
+        IPreprocessor preprocessor = new Preprocessor();
+
+        String [] stopFiles = {"stop-cz-dia-1.txt",
+                                "stop-spec-chars.txt"};
+        IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
+
+        IStemmer stemmer = new CzechStemmerAgressive();
+        ITokenizer tokenizer = new AdvancedTokenizer(stopWords);
+
+        preprocessor.initialise(stemmer, tokenizer);
+        Index index = new Index(preprocessor);
 
         List<Topic> topics = SerializedDataHelper.loadTopic(new File(OUTPUT_DIR + "/topicData.bin"));
 
         File serializedData = new File(OUTPUT_DIR + "/czechData.bin");
 
-        List<Document> documents = new ArrayList<Document>();
+        List<Document> documents = new ArrayList<>();
         log.info("load");
         try {
             if (serializedData.exists()) {
@@ -62,12 +60,25 @@ public class TestTrecEval {
                 log.error("Cannot find " + serializedData);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error loading data", e);
+            System.exit(55);
         }
         log.info("Documents: " + documents.size());
 
+        //index data
+        log.info("Indexing");
+        if(new File("indexFile.idx").exists()) {
+            log.info("Load saved index");
+            index = new Index("indexFile.idx", preprocessor);
+        }else{
+            log.info("Index documents");
+            index.index(documents);
+            index.dumpIndex("indexFile.idx");
+        }
 
-        List<String> lines = new ArrayList<String>();
+        log.info("Indexing done");
+
+        List<String> lines = new ArrayList<>();
 
         for (Topic t : topics) {
             List<Result> resultHits = index.search(t.getTitle() + " " + t.getDescription());
