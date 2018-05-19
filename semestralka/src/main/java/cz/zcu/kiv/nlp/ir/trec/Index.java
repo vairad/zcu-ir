@@ -17,10 +17,13 @@ public class Index implements Indexer, Searcher {
     /** instance loggeru */
     private static Logger logger = LogManager.getLogger(Index.class.getName());
 
+
+    @Override
     public void index(List<Document> documents) {
         //  todo implement
     }
 
+    @Override
     public List<Result> search(String query) {
         //  todo implement
         return null;
