@@ -27,7 +27,7 @@
 	<Appenders>
 		<Console name="screen" target="SYSTEM_OUT">
 			<PatternLayout pattern="${pFormat}" />
-			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
 		</Console>
 
 		<File name="TrecEval" fileName="${sys:output.dir}/${sys:current.date.time}-${suffix}">
