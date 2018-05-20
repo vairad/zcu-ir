@@ -65,10 +65,10 @@ public class TestTrecEval {
         }
         log.info("Documents: " + documents.size());
 
-        //index data
+        //query data
         log.info("Indexing");
         if(new File("indexFile.idx").exists()) {
-            log.info("Load saved index");
+            log.info("Load saved index.");
             index = new Index("indexFile.idx", preprocessor);
         }else{
             log.info("Index documents");

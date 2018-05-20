@@ -1,5 +1,7 @@
 package cz.zcu.kiv.nlp.ir.trec.data;
 
+import java.util.Objects;
+
 /**
  * Created by Tigi on 6.1.2015.
  */
@@ -43,5 +45,19 @@ public abstract class AbstractResult implements Result {
 
     public String toString(String topic) {
         return topic + " Q0 " + documentID + " " + rank + " " + score + " runindex1";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractResult)) return false;
+        AbstractResult that = (AbstractResult) o;
+        return Objects.equals(documentID, that.documentID);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(documentID);
     }
 }

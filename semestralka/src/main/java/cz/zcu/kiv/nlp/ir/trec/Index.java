@@ -4,13 +4,12 @@ import cz.zcu.kiv.nlp.ir.trec.data.Document;
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.IPreprocessor;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.Utils;
+import cz.zcu.kiv.nlp.ir.trec.query.BooleanQuery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Radek Vais
@@ -42,7 +41,7 @@ public class Index implements Indexer, Searcher {
     private void addTokensToIndex(List<String> tokens, String docId){
         for (String token: tokens) {
             Map<String, Integer> wordRecord = inMemoryIndex.get(token);
-            if(wordRecord == null){ //when word is not in index
+            if(wordRecord == null){ //when word is not in query
                 wordRecord = new HashMap<>();
                 wordRecord.put(docId, 1);
                 inMemoryIndex.put(token, wordRecord);
@@ -70,11 +69,56 @@ public class Index implements Indexer, Searcher {
 
     @Override
     public List<Result> search(String query) {
-        //  todo implement
-        return null;
+        if (!query.contains("AND") && !query.contains("OR") && !query.contains("NOT")) {
+            return searchOne(query);
+        } else {
+            Map<String, Integer> foundedDocs = BooleanQuery.search(query, inMemoryIndex);
+      //     return Evaluator.evaluate( inMemoryIndex, foundedDocs, null);
+            return null;
+        }
     }
 
 
+    private List<Result> searchOne(String term) {
+        logger.debug("Entry method");
+        List<Map<String ,Integer>> results = new ArrayList<>();
+        List<String> lookingFor = preprocessor.getProcessedForm(term);
+        for (String part : lookingFor) {
+            if(inMemoryIndex.containsKey(part))
+            results.add(inMemoryIndex.get(part));
+        }
+        if(results.size() == 0)
+        {
+            logger.debug("No documents found");
+            return null;
+        }
+      //  results.sort(Comparator.comparingInt(Map::size));
+        Map<String, Integer> foundedDocs = new HashMap<>(10*results.size()); //predpokladame 10 záznamů pro hledné slovo
+        for(Map<String, Integer> result:results){
+            for(String key: result.keySet()){
+                if(foundedDocs.containsKey(key)){
+                    Integer docFreq = foundedDocs.get(key);
+                    docFreq += result.get(key);
+                    foundedDocs.replace(key, docFreq);
+                }else {
+                    foundedDocs.put(key, result.get(key));
+                }
+            }
+        }
+        //TODO REPAIR
+        return Evaluator.evaluate(8140, foundedDocs);
+    }
+
+    //================================================================================================================
+    //==================================
+    //=============== Saving methods
+    //==================================
+
+
+    /**
+     *
+     * @param filePath
+     */
     void dumpIndex(String filePath)
     {
         try {
@@ -85,11 +129,15 @@ public class Index implements Indexer, Searcher {
             fileOut.close();
             logger.info("Index saved into: "+filePath);
         } catch (IOException exception) {
-            logger.error("Problem with saving index");
+            logger.error("Problem with saving query");
             logger.debug("Index saving exception", exception);
         }
     }
 
+    /**
+     *
+     * @param serializedFile
+     */
     private void loadIndex(File serializedFile) {
         final Object object;
         try {
@@ -98,7 +146,7 @@ public class Index implements Indexer, Searcher {
             objectInputStream.close();
             inMemoryIndex = (Map<String, Map<String, Integer>>) object;
         } catch (Exception ex) {
-            logger.error("Problem with loading index", ex);
+            logger.error("Problem with loading query", ex);
             throw new RuntimeException(ex);
         }
     }

@@ -11,6 +11,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.Token;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -46,9 +47,9 @@ public class HelloLucene {
     }
 
     // 2. query
-      String querystr = args.length > 0 ? args[0] : "stomatolog";
-//  String querystr = args.length > 0 ? args[0] : "stomatolog AND vynikající";
-      // String querystr = args.length > 0 ? args[0] : "(stomatolog AND vynikající) OR pediatr";
+    //  String querystr = args.length > 0 ? args[0] : "stomatolog";
+  //  String querystr = args.length > 0 ? args[0] : "stomatolog AND vynikající";
+     String querystr = args.length > 0 ? args[0] : "(stomatolog AND vynikající) OR pediatr";
 //    String querystr = args.length > 0 ? args[0] : "Holubářová";
   //  String querystr = args.length > 0 ? args[0] : "\"prase\"~3";
 
@@ -56,6 +57,14 @@ public class HelloLucene {
     // the "title" arg specifies the default field to use
     // when no field is explicitly specified in the query.
     Query q = new QueryParser("post", analyzer).parse(querystr);
+
+    QueryParser parser = new QueryParser("post", analyzer);
+    Token t =parser.getNextToken();
+     t = parser.getNextToken();
+     t = parser.getNextToken();
+     t = parser.getNextToken();
+     t = parser.getNextToken();
+
 
     // 3. search
     int hitsPerPage = 10;
