@@ -24,7 +24,7 @@ public interface IPreprocessor {
      * Metoda předzpracuje předaný text a vrátí seznam, nalezených a vytvořených tokenů.
      * @param sentence - Libovolý řetězec dokumentu, ze kterého mají být vytvořeny tokeny.
      * @return Seznam extrahovaných tokenů.
-     * @throws IllegalStateException V případě, že nejsou nastaveny povinné komponenty (volání initialise()) {@see initialise()}.
+     * @throws IllegalStateException V případě, že nejsou nastaveny povinné komponenty (volání initialise()).
      */
     List<String> getProcessedForm(String sentence) throws IllegalStateException;
 
