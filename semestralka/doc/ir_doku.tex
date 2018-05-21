@@ -1,0 +1,98 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[IL2]{fontenc}
+\usepackage[czech]{babel}
+\usepackage{graphicx}
+
+\begin{document}
+\begin{figure}[h!]
+\centering
+\includegraphics[bb= 0 0 820 445 , width=75mm]{favlogo.jpg}
+\end{figure}
+
+{\centering
+{\huge Systém automatické indexace}\\[1em]
+{\large KIV/IR}\\[11,5cm]
+}
+
+\begin{tabular}{l r}
+student: & Radek VAIS\\
+os. číslo: & A17N0093P\\
+mail: & vaisr@students.zcu.cz\\
+datum: & 20.5.2018\\
+\end{tabular}
+
+\thispagestyle{empty}
+\newpage
+
+%========================================
+%========================================
+%========================================
+%========================================
+%========================================
+\section{Zadání} %=====================================================================================================
+
+S využitím připravených rozhraní v jazyce Java navrhněte a implementujte systém automatické indexace a vyhledávání dokumentů.
+
+\subsection{Minimální funkčnost:}
+
+Tokenizace, Preprocessing (stopwords remover, stemmer/lemmatizer), vytvoření in-memory invertovaného indexu, tf-idf model, cosine similarity,  vyhledávání pomocí dotazu vrací top x výsledků seřazených dle relevance, vyhledávání s pomocí logických operátorů AND, OR, NOT, podrobná dokumentace (programátorská i uživatelská)
+
+\subsection{Nadstandardní funkčnost:}
+
+File-based index (1b), pozdější doindexování dat (1b), ošetření např. HTML tagů (1b), detekce jazyka (1b), vylepšení vyhledávání (1b), vyhledávání frází (i stop slova)(1b), vyhledávání v okolí slova (1b), více scoring modelů (1b),  indexování webového obsahu (2b), další předzpracování normalizace (1b), webové rozhraní/GUI (2b), napovídání keywords (1b), podpora více polí pro dokument (např. datum)(1b), CRUD indexovaných dokumentů (2b), zvýraznění hledaného textu v náhledu výsledků (1b), dokumentace psaná v TEXu (1b), atd. (xb)
+
+
+%====================================================================================================================================================
+\newpage
+
+\section{Popis řešení}
+
+
+\section{Ovládání}
+
+\subsection{Sestavení}
+
+
+\subsection{Spuštění}
+
+
+\section{Závěr}
+
+V rámci této semestrální práce byl vytvořen systém automatické indexace a vyhledávání dokumentů s následujícími vlastnostmi.
+
+\begin{itemize}
+\item Předzpracování
+	\begin{itemize}
+		\item Odstranění diakritiky
+		\item Stemming slov
+		\item Přeskočení stop slov.
+		\item Tokenizace pomocí regulárních výrazů.
+	\end{itemize}
+\item{Indexace}
+		\begin{itemize}
+		\item Vytváření in-memory invertovaného indexu.
+		\item Načítání indexu do paměti z uloženého souboru.
+	\end{itemize}
+\item{Vyhledávání}
+	\begin{itemize}
+		\item Vyhledávání pomocí booleovských operátorů.
+		\item TF-IDF model.
+		\item Cosinová podobnost.
+	\end{itemize}
+\item{Uživatelské rozhraní}
+	\begin{itemize}
+		\item Implementováno pomocí prostředků JavaFX
+		\item Možnost zadat dotaz.
+		\item Zobrazení top 10 výsledků.
+		\item Možnost načtení uloženého indexu.
+	\end{itemize}
+\item{Dokumentace}
+	\begin{itemize}
+		\item Akademická dokumentace sázena systémem \LaTeX
+		\item Uživatelská dokumentace. (součást akademické)
+		\item Programátorská dokumentace JavaDoc. (součást zdrojových souborů) 
+	\end{itemize}	
+\end{itemize}
+
+\end{document}
