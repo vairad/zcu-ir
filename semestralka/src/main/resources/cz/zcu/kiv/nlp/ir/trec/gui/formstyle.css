@@ -1,0 +1,17 @@
+.title {
+    -fx-font-size: 200%;
+}
+
+.presentWords{
+    -fx-font-size: 100%;
+}
+
+.missingWords{
+    -fx-font-size: 100%;
+    -fx-strikethrough: true;
+}
+
+.preview{
+    -fx-font-size: 150%;
+
+}
