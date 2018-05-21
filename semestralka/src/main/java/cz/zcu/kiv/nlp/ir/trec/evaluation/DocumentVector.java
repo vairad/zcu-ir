@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Třída představuje vektor dokumentu získaný výpočtem jiného modulu modulem evaluace.
@@ -70,6 +71,16 @@ public class DocumentVector implements Serializable {
             termToId.put(term, index);
         }
         tfidfValues[index] = value;
+    }
+
+    public static void addTerms(Set<String> terms){
+        for (String term: terms) {
+            Integer index = termToId.get(term);
+            if(index == null){
+                index = nextID++;
+                termToId.put(term, index);
+            }
+        }
     }
 
     /**
