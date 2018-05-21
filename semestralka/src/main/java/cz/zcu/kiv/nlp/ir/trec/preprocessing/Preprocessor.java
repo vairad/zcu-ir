@@ -24,7 +24,7 @@ public class Preprocessor implements IPreprocessor {
 
     @Override
     public void initialise(IStemmer stemmer, ITokenizer tokenizer) {
-        logger.trace("Entry method");
+       // logger.trace("Entry method");
         if(stemmer != null){
             logger.debug("Stemmer set up: "+stemmer);
             this.stemmer = stemmer;
@@ -34,38 +34,38 @@ public class Preprocessor implements IPreprocessor {
             logger.debug("Set up tokenizer: "+tokenizer);
             this.tokenizer = tokenizer;
         }
-        logger.trace("End method");
+      //  logger.trace("End method");
     }
 
     @Override
     public List<String> getProcessedForm(String sentence) {
-        logger.trace("Entry method");
+        //logger.trace("Entry method");
         if(tokenizer == null){
             logger.warn("Tokenizer was not set");
             throw new IllegalStateException("Tokenizer was not set.");
         }
 
-        logger.trace("To lower case");
+      //  logger.trace("To lower case");
         sentence = sentence.toLowerCase();
 
-        logger.trace("Remove accents");
+      //  logger.trace("Remove accents");
         sentence = Utils.removeAccents(sentence);
 
-        logger.trace("Trim");
+       // logger.trace("Trim");
         sentence = sentence.trim();
 
-        logger.trace("Tokenize");
+       // logger.trace("Tokenize");
         List<String> tokens = tokenizer.getTokens(sentence);
 
         if(stemmer != null){
-            logger.trace("Steming");
+          //  logger.trace("Steming");
             List<String> stemmed = new ArrayList<>(tokens.size());
             for (String token: tokens) {
                 stemmed.add(stemmer.stem(token));
             }
             tokens = stemmed;
         }
-        logger.trace("End method");
+       // logger.trace("End method");
         return tokens;
     }
 

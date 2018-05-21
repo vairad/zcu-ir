@@ -2,7 +2,7 @@ package cz.zcu.kiv.nlp.ir.trec.preprocessing;
 
 /**
  * Rozhraní pro službu stemmingu.
- * @Author Radek Vais
+ * @author Radek Vais
  */
 public interface IStemmer {
 
