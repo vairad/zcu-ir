@@ -36,10 +36,11 @@ public class Evaluator {
                 : (float) ((1.0 + Math.log10(termFreq)) * Math.log10((double) documentCount / (double) documentFreq));
     }
 
-    public static Map<String, DocumentVector> evaluateIndex(Map<String, TokenProperties> invertedIndex, List<Document> documents) {
+    public static Map<String, DocumentVector> evaluateDocumentSet(Map<String, TokenProperties> invertedIndex
+                                                        , Set<String> docIds, int allDocumentsCount) {
         Map<String, DocumentVector> documentIndex = new HashMap<>();
-        for (Document document: documents) {
-            documentIndex.put(document.getId(), new DocumentVector(new float[invertedIndex.size()]));
+        for (String docID: docIds) {
+            documentIndex.put(docID, new DocumentVector(new float[invertedIndex.size()]));
         }
         
         for (Iterator<Map.Entry<String, TokenProperties>> it = invertedIndex.entrySet().iterator(); it.hasNext(); ) {
@@ -47,9 +48,32 @@ public class Evaluator {
             Map<String, Integer> postings = token.getPostings();
             for (String docId: postings.keySet()) {
                 DocumentVector dv = documentIndex.get(docId);
-                dv.setAt(token.getToken(), Evaluator.countTfIdf(postings.get(docId), postings.size(), documents.size()));
+                dv.setAt(token.getToken(), Evaluator.countTfIdf(postings.get(docId), postings.size(), allDocumentsCount));
             }
         }
         return documentIndex;
+    }
+
+    public static DocumentVector getQueryVector(Map<String, TokenProperties> querylist, Map<String, TokenProperties> invertedIndex, int documentCount) {
+        DocumentVector dv = new DocumentVector(new float[invertedIndex.size()]);
+        for (String queryToken: querylist.keySet()) {
+            if(invertedIndex.containsKey(queryToken)){
+                dv.setAt(queryToken, Evaluator.countTfIdf(querylist.get(queryToken).getPostings().get("QUERY")
+                        , invertedIndex.get(queryToken).getPostings().size()
+                        ,documentCount));
+            }
+        }
+        return dv;
+    }
+
+    public static DocumentVector getDocumentVector(Map<String, TokenProperties> invertedIndex, String docId, List<String> docTokens, int documentCount) {
+        DocumentVector dv = new DocumentVector(new float[invertedIndex.size()]);
+        for (String token : docTokens) {
+            Map<String, Integer> postings = invertedIndex.get(token).getPostings();
+            if (postings.containsKey(docId)) {
+                dv.setAt(token, Evaluator.countTfIdf(postings.get(docId), postings.size(), documentCount));
+            }
+        }
+        return dv;
     }
 }

@@ -73,7 +73,8 @@ public class TestTrecEval {
         }else{
             log.info("Index documents");
             index.index(documents);
-            index.dumpIndex("indexFile");
+         //   log.info("Save index to disk");
+         //   index.dumpIndex("indexFile");
         }
 
         log.info("Indexing done");
@@ -104,7 +105,7 @@ public class TestTrecEval {
         IOUtils.saveFile(outputFile, lines);
         //try to run evaluation
         try {
-            //runTrecEval(outputFile.toString());  TODO odkomentovat trec eval
+            runTrecEval(outputFile.toString()); // TODO odkomentovat trec eval
         } catch (Exception e) {
             e.printStackTrace();
         }

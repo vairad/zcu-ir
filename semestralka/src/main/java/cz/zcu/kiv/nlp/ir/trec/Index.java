@@ -2,16 +2,17 @@ package cz.zcu.kiv.nlp.ir.trec;
 
 import cz.zcu.kiv.nlp.ir.trec.data.Document;
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
+import cz.zcu.kiv.nlp.ir.trec.data.ResultImpl;
+import cz.zcu.kiv.nlp.ir.trec.evaluation.DocumentVector;
+import cz.zcu.kiv.nlp.ir.trec.evaluation.Evaluator;
 import cz.zcu.kiv.nlp.ir.trec.index.TokenProperties;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.IPreprocessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author Radek Vais
@@ -31,6 +32,23 @@ public class Index implements Indexer, Searcher {
      * token : TokenProperties
      */
     private Map<String, TokenProperties> invertedIndex;
+
+    /** invertovaný index dotazu
+     *
+     * token : TokenProperties
+     */
+    private Map<String, TokenProperties> queryIndex;
+
+    Set<String> connectedDocuments;
+
+    private final String QUERY_DOCID = "QUERY";
+
+    private Map<String, List<String>> documents;
+
+    private static volatile Semaphore semaphore = new Semaphore(1);
+    private static volatile Iterator<String> searchingIterator;
+    private static volatile PriorityQueue<ResultImpl> resultsQueue;
+    private static volatile DocumentVector queryVector;
 
     /**
      * Konstruktor načte invertovný index z paměti.
@@ -55,6 +73,7 @@ public class Index implements Indexer, Searcher {
      //   logger.trace("Entry method");
         this.preprocessor = preprocessor;
         invertedIndex = new HashMap<>();
+        queryIndex = new HashMap<>();
     }
 
 
@@ -62,16 +81,22 @@ public class Index implements Indexer, Searcher {
     public void index(List<Document> documents) {
         logger.debug("Start indexing");
         documentCount = documents.size();
+        this.documents = new HashMap<>();
         int count = 0;
         for (Document document: documents) {
             List<String> tokens = preprocessor.getProcessedForm(document.getText());
-            addToInvertIndex(tokens, document.getId());
+            this.documents.put(document.getId(), tokens);
+            addToInvertIndex(tokens, document.getId(), invertedIndex);
             count++;
             if (count % 5000 == 0){
                 logger.info("Indexed "+count+" documents");
             }
         }
         logger.info("Indexed "+count+" documents");
+
+        //add dictionary to vector class
+        DocumentVector.addTerms(invertedIndex.keySet());
+
         logger.debug("Inverted index created.");
     }
 
@@ -82,7 +107,10 @@ public class Index implements Indexer, Searcher {
      * @param tokens token pro zařzení.
      * @param docID id dokumentu, kde byl token nalezen.
      */
-    private void addToInvertIndex(List<String> tokens, String docID) {
+    private void addToInvertIndex(List<String> tokens, String docID, Map<String,TokenProperties> invertedIndex) {
+        if (invertedIndex == null){
+            invertedIndex = this.invertedIndex;
+        }
         for (String token: tokens) {
             TokenProperties tokenProperties = invertedIndex.get(token);
             if(tokenProperties == null){ //when word is not in query
@@ -95,14 +123,23 @@ public class Index implements Indexer, Searcher {
         }
     }
 
+    /**
+     * Metoda zařadí token do invertovaného indexu, upraví kolekci výskytu dokumentu a zvýší počet výskytů
+     *
+     * @param tokens token pro zařzení.
+     */
+    private void addToQueryIndex(List<String> tokens) {
+        addToInvertIndex(tokens, QUERY_DOCID, queryIndex);
+    }
+
 
     @Override
     public List<Result> search(String query) {
         if (!query.contains("AND") && !query.contains("OR") && !query.contains("NOT")) {
             return searchOne(query);
         } else {
-       //     Map<String, Integer> foundedDocs = BooleanQuery.search(query, inMemoryInvIndex);
-      //     return Evaluator.evaluate( inMemoryIndex, foundedDocs, null);
+            //Map<String, Integer> foundedDocs = BooleanQuery.search(query, inMemoryInvIndex);
+         // return Evaluator.evaluate( inMemoryIndex, foundedDocs, null);
             return null;
         }
     }
@@ -114,34 +151,99 @@ public class Index implements Indexer, Searcher {
      * @return kolekce dokumentů obsahujících alespoň jedno slovo z dotazu.
      */
     private List<Result> searchOne(String query) {
-     //   logger.debug("Entry method");
-        List<Map<Integer ,Integer>> results = new ArrayList<>();
+        logger.debug("Single search");
+        connectedDocuments = new TreeSet<>();
         List<String> lookingFor = preprocessor.getProcessedForm(query);
-        for (String part : lookingFor) {
-          //  if(inMemoryInvIndex.containsKey(part))
-         //   results.add(inMemoryInvIndex.get(part));
+        addToQueryIndex(lookingFor);
+        //find apropriet doccuments
+        for (String token :lookingFor) {
+            connectedDocuments.addAll(connectedDocuments(token));
         }
-        if(results.size() == 0)
-        {
-            logger.debug("No documents found");
-            return null;
+        logger.debug("Founded "+connectedDocuments.size()+" related documents.");
+
+       //get DocumentVector of query
+        queryVector = Evaluator.getQueryVector(queryIndex,invertedIndex,documentCount);
+        //rank documents against query by cosine distance
+        resultsQueue = new PriorityQueue<>(1, (o1, o2) -> -Float.compare(o1.getScore(), o2.getScore()));
+
+        searchingIterator = connectedDocuments.iterator();
+        runParallelEvaluation();
+
+        LinkedList<Result> results = new LinkedList<>();
+        //prepare top 10 result
+        for (int i = 1; i < 11; i++) {
+            ResultImpl result = resultsQueue.poll();
+            if(result == null){
+                break;
+            }
+            result.setRank(i);
+            results.addLast(result);
         }
-      //  results.sort(Comparator.comparingInt(Map::size));
-        Map<Integer, Integer> foundedDocs = new HashMap<>(10*results.size()); //predpokladame 10 záznamů pro hledné slovo
-        for(Map<Integer, Integer> result:results){
-            for(int key: result.keySet()){
-                if(foundedDocs.containsKey(key)){
-                    Integer docFreq = foundedDocs.get(key);
-                    docFreq += result.get(key);
-                    foundedDocs.replace(key, docFreq);
-                }else {
-                    foundedDocs.put(key, result.get(key));
+        return results;
+    }
+
+    private void runParallelEvaluation() {
+
+        List<Thread> threads = new LinkedList<>();
+        for (int i = 0; i < 6 ; i++) {
+            threads.add(new Thread(() -> {
+                String docId = getDocumentId();
+                while (docId != null) {
+                    //logger.debug(docId);
+                    DocumentVector document = Evaluator.getDocumentVector(invertedIndex,docId
+                            , documents.get(docId)
+                            , documentCount);
+                    ResultImpl result = new ResultImpl();
+                    (result).setDocumentID(docId);
+                    result.setScore(document.cosineDistance(queryVector));
+                    giveResult(result);
+                    docId = getDocumentId();
                 }
+            }));
+        }
+        for (Thread t: threads) {
+            t.start();
+        }
+        for (Thread t: threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                logger.error("Thread problem", e);
             }
         }
-        //TODO REPAIR
-      //  return Evaluator.evaluate(8140, foundedDocs);
-        return null;
+    }
+
+    synchronized String getDocumentId(){
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            logger.error("Mutex problem", e);
+        }
+
+        String result = null;
+        if(searchingIterator.hasNext()){
+            result = searchingIterator.next();
+        }
+        semaphore.release();
+        return result;
+    }
+
+    synchronized void giveResult(ResultImpl result) {
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            logger.error("Mutex problem", e);
+        }
+        resultsQueue.add(result);
+        semaphore.release();
+    }
+
+    private Set<String> connectedDocuments(String token){
+        TokenProperties tokenProperties = invertedIndex.get(token);
+        if(tokenProperties == null){
+            return new TreeSet<>();
+        }
+        return tokenProperties.getPostings().keySet();
     }
 
     //================================================================================================================
@@ -163,6 +265,7 @@ public class Index implements Indexer, Searcher {
     {
         String invertedPath = filePattern+".inv";
         try {
+            logger.debug("Saving "+invertedPath);
             FileOutputStream fileOut = new FileOutputStream(invertedPath);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(invertedIndex);
@@ -188,6 +291,7 @@ public class Index implements Indexer, Searcher {
     private void loadIndex(String filePattern) {
         final Object object1;
         try {
+            logger.debug("Loading "+filePattern+".inv");
             File invertFile = new File(filePattern+".inv");
 
             final ObjectInputStream inverted = new ObjectInputStream(new FileInputStream(invertFile));
