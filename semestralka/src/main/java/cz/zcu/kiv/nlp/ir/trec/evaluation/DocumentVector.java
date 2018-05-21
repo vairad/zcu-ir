@@ -30,7 +30,7 @@ public class DocumentVector implements Serializable {
 
     /**
      * Konstruktor třídy připraví instanci a nastaví pole pro jednotlivé hodnoty.
-     * @param tfidfValues
+     * @param tfidfValues pole hodnot, musí mít velikost počtu termů.
      */
     DocumentVector(double[] tfidfValues) {
         this.tfidfValues = tfidfValues;
@@ -88,8 +88,8 @@ public class DocumentVector implements Serializable {
      */
     static double vectorSize(double[] vector){
         double size = 0.0;
-        for (int i = 0; i< vector.length; ++i){
-            size += vector[i] * vector[i];
+        for (double aVector : vector) {
+            size += aVector * aVector;
         }
         size = Math.sqrt(size);
         return size;
