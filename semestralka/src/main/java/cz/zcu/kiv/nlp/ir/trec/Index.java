@@ -7,6 +7,7 @@ import cz.zcu.kiv.nlp.ir.trec.evaluation.DocumentVector;
 import cz.zcu.kiv.nlp.ir.trec.evaluation.Evaluator;
 import cz.zcu.kiv.nlp.ir.trec.index.TokenProperties;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.IPreprocessor;
+import cz.zcu.kiv.nlp.ir.trec.query.BooleanQuery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +40,7 @@ public class Index implements Indexer, Searcher {
      */
     private Map<String, TokenProperties> queryIndex;
 
-    Set<String> connectedDocuments;
+    private Set<String> connectedDocuments;
 
     private final String QUERY_DOCID = "QUERY";
 
@@ -138,12 +139,34 @@ public class Index implements Indexer, Searcher {
         if (!query.contains("AND") && !query.contains("OR") && !query.contains("NOT")) {
             return searchOne(query);
         } else {
-            //Map<String, Integer> foundedDocs = BooleanQuery.search(query, inMemoryInvIndex);
-         // return Evaluator.evaluate( inMemoryIndex, foundedDocs, null);
-            return null;
+            return searchBoolean(query);
         }
     }
 
+    /** Metoda slouží k vyhledání dokumentů dle boolean query a následnému vyhodnocení, který je nejvhodnější
+     *
+     * @param query boolean query
+     * @return top 10 nalezených dokumentů
+     */
+    private List<Result> searchBoolean(String query) {
+        connectedDocuments = BooleanQuery.searchBoolean(query,this);
+        logger.debug("Founded "+connectedDocuments.size()+" related documents.");
+        //get DocumentVector of query
+        queryVector = Evaluator.getQueryVector(queryIndex,invertedIndex,documentCount);
+        searchingIterator = connectedDocuments.iterator();
+        runParallelEvaluation();
+        LinkedList<Result> results = new LinkedList<>();
+        //prepare top 10 result
+        for (int i = 1; i < 11; i++) {
+            ResultImpl result = resultsQueue.poll();
+            if(result == null){
+                break;
+            }
+            result.setRank(i);
+            results.addLast(result);
+        }
+        return results;
+    }
 
     /**
      * Metoda vyhledá v indexovaném indexu dokumenty podle jednoduchého dotazu.
@@ -152,13 +175,7 @@ public class Index implements Indexer, Searcher {
      */
     private List<Result> searchOne(String query) {
         logger.debug("Single search");
-        connectedDocuments = new TreeSet<>();
-        List<String> lookingFor = preprocessor.getProcessedForm(query);
-        addToQueryIndex(lookingFor);
-        //find apropriet doccuments
-        for (String token :lookingFor) {
-            connectedDocuments.addAll(connectedDocuments(token));
-        }
+        connectedDocuments = allConnectedDocuments(preprocessor.getProcessedForm(query));
         logger.debug("Founded "+connectedDocuments.size()+" related documents.");
 
        //get DocumentVector of query
@@ -182,6 +199,9 @@ public class Index implements Indexer, Searcher {
         return results;
     }
 
+    /**
+     * Metorda slouží ke spuštění parlelního výpočtu cosinové podobnosti nalezených dokumentů s query.
+     */
     private void runParallelEvaluation() {
 
         List<Thread> threads = new LinkedList<>();
@@ -213,7 +233,11 @@ public class Index implements Indexer, Searcher {
         }
     }
 
-    synchronized String getDocumentId(){
+    /**
+     * Meotoda přidělující seznam dokumentů k pralelnímu propočítání.
+     * @return docId k výpočtu podobnosti.
+     */
+    synchronized private String getDocumentId(){
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {
@@ -228,7 +252,11 @@ public class Index implements Indexer, Searcher {
         return result;
     }
 
-    synchronized void giveResult(ResultImpl result) {
+    /**
+     * Meotda sloužící k paralelnímu uložení výsledků.
+     * @param result Výsledek k uložení.
+     */
+    synchronized private void giveResult(ResultImpl result) {
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {
@@ -238,12 +266,69 @@ public class Index implements Indexer, Searcher {
         semaphore.release();
     }
 
+    /**
+     * Metoda slouží k nalezení všech dokumentů obsahující některé ze slov z dotazu
+     * @param tokens seznam všech tokenů dotazu
+     * @return množina docID
+     */
+    public Set<String> allConnectedDocuments(List<String> tokens){
+        Set<String> connectedDocuments = new TreeSet<>();
+        List<String> lookingFor = tokens;
+        addToQueryIndex(lookingFor);
+        //find apropriet doccuments
+        for (String token :lookingFor) {
+            connectedDocuments.addAll(connectedDocuments(token));
+        }
+        return connectedDocuments;
+    }
+
+    /**
+     * Metoda vracející seznm docID výskytů pro vybraný token.
+     * @param token token z dotazu
+     * @return seznam docId, kde se token vyskytuje.
+     */
     private Set<String> connectedDocuments(String token){
         TokenProperties tokenProperties = invertedIndex.get(token);
         if(tokenProperties == null){
             return new TreeSet<>();
         }
         return tokenProperties.getPostings().keySet();
+    }
+
+    /**
+     * Metoda vracející seznsm docID bez vybraného tokenu.
+     * @param token token z dotazu
+     * @return seznam docId, kde se token NEvyskytuje.
+     */
+    private Set<String> notConnectedDocuments(String token){
+        TokenProperties tokenProperties = invertedIndex.get(token);
+        if(tokenProperties == null){
+            return new TreeSet<>();
+        }
+        Set<String> allKeys = documents.keySet();
+        allKeys.removeAll(tokenProperties.getPostings().keySet());
+        return allKeys;
+    }
+
+    public List<String> tokenQuery(String singleQuery) {
+        return preprocessor.getProcessedForm(singleQuery);
+    }
+
+
+    /**
+     *  Metoda slouží k nalezení všech dokumentů NEobsahující některé ze slov z dotazu
+     * @param tokens seznam tokenů
+     * @return množina dokumentů, neobsahující slova
+     */
+    public Set<String> allNotConnectedDocuments(List<String> tokens) {
+        Set<String> notConnectedDocuments = new TreeSet<>();
+        List<String> lookingFor = tokens;
+
+        //find apropriet NOTdoccuments
+        for (String token :lookingFor) {
+            notConnectedDocuments.addAll(notConnectedDocuments(token));
+        }
+        return notConnectedDocuments;
     }
 
     //================================================================================================================
