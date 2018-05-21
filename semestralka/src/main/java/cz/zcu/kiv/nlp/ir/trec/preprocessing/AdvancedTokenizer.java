@@ -1,6 +1,5 @@
 package cz.zcu.kiv.nlp.ir.trec.preprocessing;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
