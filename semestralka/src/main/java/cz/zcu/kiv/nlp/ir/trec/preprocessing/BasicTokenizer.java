@@ -52,6 +52,6 @@ public class BasicTokenizer implements ITokenizer {
 
     @Override
     public String toString(){
-        return "AdvancedTokenizer";
+        return this.getClass().getName();
     }
 }

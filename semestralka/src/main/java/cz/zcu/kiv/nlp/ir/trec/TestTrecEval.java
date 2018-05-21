@@ -1,8 +1,6 @@
 package cz.zcu.kiv.nlp.ir.trec;
 
-import cz.zcu.kiv.nlp.ir.trec.data.Document;
-import cz.zcu.kiv.nlp.ir.trec.data.Result;
-import cz.zcu.kiv.nlp.ir.trec.data.Topic;
+import cz.zcu.kiv.nlp.ir.trec.data.*;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,8 +27,11 @@ public class TestTrecEval {
         System.setProperty("output.dir", TestTrecEval.OUTPUT_DIR);
         System.setProperty("log4j.configurationFile", "log-conf.xml");
     }
+
+    /** instance loggeru */
     private static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
 
+    /** složka pro data a log TrecEval */
     private static final String OUTPUT_DIR = "TREC";
 
     public static void main(String args[]) {
@@ -41,8 +42,8 @@ public class TestTrecEval {
                                 "stop-spec-chars.txt"};
         IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
 
-        IStemmer stemmer = new CzechStemmerAgressive();
-        ITokenizer tokenizer = new AdvancedTokenizer(stopWords);
+        IStemmer stemmer = new CzechStemmerLight();
+        ITokenizer tokenizer = new BasicTokenizer(stopWords);
 
         preprocessor.initialise(stemmer, tokenizer);
         Index index = new Index(preprocessor);
@@ -65,15 +66,14 @@ public class TestTrecEval {
         }
         log.info("Documents: " + documents.size());
 
-        //query data
         log.info("Indexing");
-        if(new File("indexFile.idx").exists()) {
+        if(new File("indexFile.inv").exists()) {
             log.info("Load saved index.");
-            index = new Index("indexFile.idx", preprocessor);
+            index = new Index("indexFile", preprocessor);
         }else{
             log.info("Index documents");
             index.index(documents);
-            index.dumpIndex("indexFile.idx");
+            index.dumpIndex("indexFile");
         }
 
         log.info("Indexing done");
@@ -104,7 +104,7 @@ public class TestTrecEval {
         IOUtils.saveFile(outputFile, lines);
         //try to run evaluation
         try {
-            runTrecEval(outputFile.toString());
+            //runTrecEval(outputFile.toString());  TODO odkomentovat trec eval
         } catch (Exception e) {
             e.printStackTrace();
         }

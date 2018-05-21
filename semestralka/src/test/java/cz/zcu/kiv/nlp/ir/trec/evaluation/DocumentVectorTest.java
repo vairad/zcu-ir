@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class DocumentVectorTest {
 
-    double[] vectorSaS = new double[]{3.06, 2.0, 1.30, 0};
-    double[] vectorPaP = new double[]{2.76, 1.85, 0, 0};
-    double[] vectorWH = new double[]{2.30, 2.04, 1.78, 2.58};
+    float[] vectorSaS = new float[]{(float) 3.06, (float) 2.0, (float) 1.30, 0};
+    float[] vectorPaP = new float[]{(float) 2.76, (float) 1.85, 0, 0};
+    float[] vectorWH = new float[]{(float) 2.30, (float) 2.04, (float) 1.78, (float) 2.58};
 
     DocumentVector SaS = new DocumentVector(vectorSaS);
     DocumentVector PaP = new DocumentVector(vectorPaP);
@@ -20,7 +20,7 @@ class DocumentVectorTest {
 
     @org.junit.jupiter.api.Test
     void testVectorSize(){
-        double[] vector = new double[]{1.0, 2.0, 4.0};
+        float[] vector = new float[]{(float) 1.0, (float) 2.0, (float) 4.0};
 
         double result = DocumentVector.vectorSize(vector);
         assertEquals(4.5825, result, 0.0001, "Bad vector size computation.");
@@ -28,7 +28,7 @@ class DocumentVectorTest {
 
     @org.junit.jupiter.api.Test
     void testVectorSize2(){
-        double[] vector = new double[]{2.0, 2.0, 2, 2};
+        float[] vector = new float[]{(float) 2.0, (float) 2.0, 2, 2};
 
         double result = DocumentVector.vectorSize(vector);
         assertEquals(4., result, 0.0001, "Bad vector size computation.");
@@ -76,11 +76,11 @@ class DocumentVectorTest {
         DocumentVector doc = new DocumentVector(vectorWH);
 
         try {
-            doc.setAt("A", 3.0);
-            doc.setAt("B", 4.0);
-            doc.setAt("C", 5.0);
-            doc.setAt("D", 5.0);
-            doc.setAt("E", 5.0);
+            doc.setAt("A", 3.0f);
+            doc.setAt("B", 4.0f);
+            doc.setAt("C", 5.0f);
+            doc.setAt("D", 5.0f);
+            doc.setAt("E", 5.0f);
         }catch (IndexOutOfBoundsException e){
             return;
         }
@@ -91,11 +91,11 @@ class DocumentVectorTest {
     void testSetAt1(){
         DocumentVector doc = new DocumentVector(vectorWH);
 
-        doc.setAt("A", 3.0);
-        doc.setAt("A", 4.0);
-        doc.setAt("A", 5.0);
-        doc.setAt("A", 5.0);
-        doc.setAt("A", 5.0);
+        doc.setAt("A", 3.0f);
+        doc.setAt("A", 4.0f);
+        doc.setAt("A", 5.0f);
+        doc.setAt("A", 5.0f);
+        doc.setAt("A", 5.0f);
 
         assertEquals(5.0, doc.getTfidfValues()[0], 0.1, "Wrong Translate");
     }

@@ -19,7 +19,7 @@ public class DocumentVector implements Serializable {
     private static Logger logger = LogManager.getLogger(Index.class.getName());
 
     /** hodnoty vektoru dokumentu */
-    private double[] tfidfValues;
+    private float[] tfidfValues;
 
     /** další přidělované ID -- staticky pro všechny instnce stejné */
     private static int nextID = 0;
@@ -32,7 +32,7 @@ public class DocumentVector implements Serializable {
      * Konstruktor třídy připraví instanci a nastaví pole pro jednotlivé hodnoty.
      * @param tfidfValues pole hodnot, musí mít velikost počtu termů.
      */
-    DocumentVector(double[] tfidfValues) {
+    DocumentVector(float[] tfidfValues) {
         this.tfidfValues = tfidfValues;
     }
 
@@ -42,7 +42,7 @@ public class DocumentVector implements Serializable {
      * @return 0 .. 1 kde 1 je identický vektor.
      */
     public float cosineDistance(DocumentVector other) {
-        double[] otherTfIdf = other.getTfidfValues();
+        float[] otherTfIdf = other.getTfidfValues();
 
         if(otherTfIdf.length != this.tfidfValues.length){
             logger.error("Vectors have different legth.");
@@ -63,7 +63,7 @@ public class DocumentVector implements Serializable {
      * @param term term pro který zdáváme hodnotu.
      * @param value hodnota k zápisu.
      */
-    void setAt(String term, double value){
+    void setAt(String term, float value){
         Integer index = termToId.get(term);
         if(index == null){
             index = nextID++;
@@ -76,7 +76,7 @@ public class DocumentVector implements Serializable {
      * Vrací vektor hodnot.
      * @return vektor dokumentu.
      */
-    public double[] getTfidfValues() {
+    public float[] getTfidfValues() {
         return tfidfValues;
     }
 
@@ -86,7 +86,7 @@ public class DocumentVector implements Serializable {
      * @param vector vektor pro výpočet normy
      * @return norma vektoru
      */
-    static double vectorSize(double[] vector){
+    static double vectorSize(float[] vector){
         double size = 0.0;
         for (double aVector : vector) {
             size += aVector * aVector;

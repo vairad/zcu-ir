@@ -1,5 +1,7 @@
-package cz.zcu.kiv.nlp.ir.trec;
+package cz.zcu.kiv.nlp.ir.trec.evaluation;
 
+import cz.zcu.kiv.nlp.ir.trec.index.TokenProperties;
+import cz.zcu.kiv.nlp.ir.trec.data.Document;
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
 import cz.zcu.kiv.nlp.ir.trec.data.ResultImpl;
 
@@ -32,5 +34,22 @@ public class Evaluator {
     static float countTfIdf(int termFreq, int documentFreq, int documentCount){
         return termFreq == 0 ? (float) Math.log10((double) documentCount / (double) documentFreq)
                 : (float) ((1.0 + Math.log10(termFreq)) * Math.log10((double) documentCount / (double) documentFreq));
+    }
+
+    public static Map<String, DocumentVector> evaluateIndex(Map<String, TokenProperties> invertedIndex, List<Document> documents) {
+        Map<String, DocumentVector> documentIndex = new HashMap<>();
+        for (Document document: documents) {
+            documentIndex.put(document.getId(), new DocumentVector(new float[invertedIndex.size()]));
+        }
+        
+        for (Iterator<Map.Entry<String, TokenProperties>> it = invertedIndex.entrySet().iterator(); it.hasNext(); ) {
+            TokenProperties token = (TokenProperties) it.next();
+            Map<String, Integer> postings = token.getPostings();
+            for (String docId: postings.keySet()) {
+                DocumentVector dv = documentIndex.get(docId);
+                dv.setAt(token.getToken(), Evaluator.countTfIdf(postings.get(docId), postings.size(), documents.size()));
+            }
+        }
+        return documentIndex;
     }
 }

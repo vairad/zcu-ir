@@ -1,7 +1,7 @@
-package cz.zcu.kiv.nlp.ir.trec;
+package cz.zcu.kiv.nlp.ir.trec.evaluation;
 
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
-import org.apache.logging.log4j.core.util.Assert;
+import cz.zcu.kiv.nlp.ir.trec.evaluation.Evaluator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,4 +36,5 @@ class EvaluatorTest {
         float tfidf = Evaluator.countTfIdf(0,10, 100 );
         assertEquals( 1 , tfidf, "TfIdf count failed");
     }
+
 }
