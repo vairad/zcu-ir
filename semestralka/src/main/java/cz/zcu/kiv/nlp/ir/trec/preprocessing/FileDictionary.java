@@ -28,7 +28,7 @@ public class FileDictionary implements IDictionary {
      * @param filesToLoad seznam souborů k načtení.
      */
     public FileDictionary(List<String> filesToLoad){
-        logger.trace("Start method.");
+       // logger.trace("Start method.");
         dictionary = new HashSet<String>();
 
         for (String fileName: filesToLoad) {
@@ -46,12 +46,12 @@ public class FileDictionary implements IDictionary {
         if(dictionary.isEmpty()){
             logger.warn("Created empty dictionary.");
         }
-        logger.trace("Dictionary created.");
+      //  logger.trace("Dictionary created.");
     }
 
     @Override
     public boolean isPresent(String word) {
-        logger.trace("Entry method");
+       // logger.trace("Entry method");
         return dictionary.contains(word);
     }
 }

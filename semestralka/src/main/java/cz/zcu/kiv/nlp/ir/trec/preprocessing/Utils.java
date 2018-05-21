@@ -22,7 +22,7 @@ public class Utils {
      * @return seznam nalezených řádků
      */
     public static List<String> readTXTFile(InputStream inputStream) {
-        logger.trace("Entry method");
+       // logger.trace("Entry method");
 
         if (inputStream == null) {
             logger.warn("Parameter is null - fault");
@@ -33,7 +33,7 @@ public class Utils {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             String line;
-            logger.trace("Reading file.");
+          //  logger.trace("Reading file.");
             while ((line = br.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
                     result.add(line.trim());
@@ -41,7 +41,7 @@ public class Utils {
             }
 
             inputStream.close();
-            logger.trace("Reading done.");
+          //  logger.trace("Reading done.");
             return result;
         } catch (IOException e) {
             logger.warn("IO Exception");
