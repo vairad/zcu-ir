@@ -23,7 +23,7 @@ public class AdvancedTokenizer implements ITokenizer {
     private IDictionary stopwords;
 
     public AdvancedTokenizer(IDictionary stopwords){
-        logger.trace("Entry method");
+       // logger.trace("Entry method");
         this.stopwords = stopwords;
     }
     //cislo |  | html | tecky a sracky
@@ -40,18 +40,16 @@ public class AdvancedTokenizer implements ITokenizer {
     private static final String phoneRegex = "(\\+{0,1}(([\\d]{3}) {0,1}){3,4})";
 
     /** combination of part regexes */
-    private static final String defaultRegex = httpRegex + "|"
-                                            + dateRegex + "|"
+    private static final String defaultRegex = dateRegex + "|"
                                             + currencyRegex + "|"
                                             + phoneRegex + "|"
                                             + decimalRegex + "|"
                                             + antiFuckRegex + "|"
-                                            + htmlRegex + "|"
                                             + numberRegex + "|"
                                             + punktRegex ;
 
     private static List<String> tokenize(String text, String regex) {
-        logger.trace("Entry method");
+      //  logger.trace("Entry method");
         Pattern pattern = Pattern.compile(regex);
 
         ArrayList<String> words = new ArrayList<>();
@@ -67,24 +65,27 @@ public class AdvancedTokenizer implements ITokenizer {
         String[] ws = new String[words.size()];
         ws = words.toArray(ws);
 
-        logger.trace("Exit method");
+       // logger.trace("Exit method");
         return Arrays.asList(ws);
     }
 
     @Override
     public List<String> getTokens(String text) {
-        logger.trace("Entry method");
+      //  logger.trace("Entry method");
         List<String> results = tokenize(text, defaultRegex);
+        List<String> filtered = new ArrayList<>();
         if(stopwords != null){
-            logger.trace("Removing stopwords");
+            //logger.trace("Removing stopwords");
             for (String result: results) {
                 if(stopwords.isPresent(result)){
-                    results.remove(result);
+                    continue;
                 }
+                filtered.add(result);
             }
+            return filtered;
+        } else {
+            return results;
         }
-        logger.trace("End method");
-        return results;
     }
 
 
