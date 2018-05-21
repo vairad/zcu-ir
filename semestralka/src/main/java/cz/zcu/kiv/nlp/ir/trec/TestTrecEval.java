@@ -20,21 +20,13 @@ import java.util.*;
 
 public class TestTrecEval {
 
-    /*Statický inicializační blok nastavující odkaz (proměnnou) na konfiguraci loggeru*/
-    static{
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_SS");
-        System.setProperty("current.date.time", dateFormat.format(new Date()));
-        System.setProperty("output.dir", TestTrecEval.OUTPUT_DIR);
-        System.setProperty("log4j.configurationFile", "log-conf.xml");
-    }
-
     /** instance loggeru */
     private static Logger log = LogManager.getLogger(TestTrecEval.class.getName());
 
     /** složka pro data a log TrecEval */
-    private static final String OUTPUT_DIR = "TREC";
+    public static final String OUTPUT_DIR = "TREC";
 
-    public static void main(String args[]) {
+    public static void start(String args[]) {
 
         IPreprocessor preprocessor = new Preprocessor();
 

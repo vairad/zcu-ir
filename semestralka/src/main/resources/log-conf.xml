@@ -57,7 +57,7 @@
 			<AppenderRef ref="TrecEval"/>
 		</Logger>
 
-		<Logger name="cz.zcu.kiv.nlp.ir.trec.gui.*">
+		<Logger name="cz.zcu.kiv.nlp.ir.trec.gui.SearchWindow">
 			<AppenderRef ref="gui"/>
 		</Logger>
 

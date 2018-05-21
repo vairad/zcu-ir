@@ -16,13 +16,8 @@ import java.util.ResourceBundle;
 
 public class SearchWindow extends Application {
 
-    public static void main(String[] args) {
+    public static void processGui(String[] args) {
         launch(args);
-    }
-
-    /*Statický inicializační blok nastavující odkaz (proměnnou) na konfiguraci loggeru*/
-    static {
-        System.setProperty("log4j.configurationFile", "log-conf.xml");
     }
 
     /** instance loggeru tridy */
