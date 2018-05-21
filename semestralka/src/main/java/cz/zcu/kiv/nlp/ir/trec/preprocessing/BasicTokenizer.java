@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,6 +35,12 @@ public class BasicTokenizer implements ITokenizer {
     public List<String> getTokens(String text) {
       //  logger.trace("Entry method");
         List<String> results = tokenize(text, defaultRegex);
+        List<String> unMess = new LinkedList<>();
+        for (String result: unMess) {
+            unMess.add(result.replaceAll("\\.|,|(|)|#|&",""));
+        }
+
+
         List<String> filtered = new ArrayList<>();
         if(stopwords != null){
             //logger.trace("Removing stopwords");
