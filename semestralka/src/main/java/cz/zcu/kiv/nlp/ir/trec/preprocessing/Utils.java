@@ -11,7 +11,14 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Třída obsahující metody pro jednoduché unifikovné úkoly. Napříkald načtení souboru nebo odstranění diakritiky.
+ *
+ * @author Radek Vais
+ */
 public class Utils {
+
     /** instance loggeru */
     private static Logger logger = LogManager.getLogger(Utils.class.getName());
 
@@ -49,6 +56,11 @@ public class Utils {
         }
     }
 
+    /**
+     * Metoda odstraní diaktitiku z předaného řetězce
+     * @param text text k odstranění diakritiky
+     * @return redukovaný text
+     */
     public static String removeAccents(String text) {
         return text == null ? null : Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
