@@ -142,9 +142,6 @@ public class Index implements Indexer, Searcher {
      * @param docID id dokumentu, kde byl token nalezen.
      */
     private void addToInvertIndex(List<String> tokens, String docID, Map<String,TokenProperties> invertedIndex) {
-        if (invertedIndex == null){
-            invertedIndex = this.invertedIndex;
-        }
         for (String token: tokens) {
             TokenProperties tokenProperties = invertedIndex.get(token);
             if(tokenProperties == null){ //when word is not in query
