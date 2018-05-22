@@ -204,6 +204,11 @@ public class Index implements Indexer, Searcher {
         return topXDocs(10);
     }
 
+    /**
+     * Metoda vrací top X nalezených dokumentů v seřazeném seznamu
+     * @param count počet dokumentů ke vrácení
+     * @return TOP x výsledků
+     */
     private List<Result> topXDocs(int count) {
         LinkedList<Result> results = new LinkedList<>();
         //prepare top count result
@@ -353,6 +358,11 @@ public class Index implements Indexer, Searcher {
         return allKeys;
     }
 
+    /**
+     * Method asplit Single query to single tokens
+     * @param singleQuery query string
+     * @return list of preprocessed tokens
+     */
     public List<String> tokenQuery(String singleQuery) {
         return preprocessor.getProcessedForm(singleQuery);
     }
@@ -372,6 +382,41 @@ public class Index implements Indexer, Searcher {
             notConnectedDocuments.addAll(notConnectedDocuments(token));
         }
         return notConnectedDocuments;
+    }
+
+
+    /**
+     * Metoda vrací data originálních dokumentů
+     * @param docId index dokumentu
+     * @param len délka úravku (0 = celý obsah)
+     * @return Titulek
+     */
+    public String getDocName(String docId, int len){
+        for (Document doc: sources) {
+            if(doc.getId().compareTo(docId)==0){
+                String text = doc.getTitle();
+                len = len > 0 && len < text.length() ? len : text.length() ;
+                return text.substring(0,len);
+            }
+        }
+        return  "**Undefined document**";
+    }
+
+    /**
+     * Metoda vraci data originách dokumentů
+     * @param docId index dokumentu
+     * @param len délka úryvku (0 = celý obsah)
+     * @return prvních len znaků
+     */
+    public String getDocPre(String docId, int len){
+        for (Document doc: sources) {
+            if(doc.getId().compareTo(docId)==0){
+                String text = doc.getText();
+                len = len > 0 && len < text.length() ? len : text.length() ;
+                return text.substring(0,len);
+            }
+        }
+        return  "**Undefine document**";
     }
 
     //================================================================================================================
@@ -447,39 +492,5 @@ public class Index implements Indexer, Searcher {
             logger.error("Problem with loading index", ex);
             throw new RuntimeException(ex);
         }
-    }
-
-    /**
-     * Metoda vrací data originálních dokumentů
-     * @param docId index dokumentu
-     * @param len délka úravku (0 = celý obsah)
-     * @return Titulek
-     */
-    public String getDocName(String docId, int len){
-        for (Document doc: sources) {
-            if(doc.getId().compareTo(docId)==0){
-                String text = doc.getTitle();
-                len = len > 0 && len < text.length() ? len : text.length() ;
-                return text.substring(0,len);
-            }
-        }
-        return  "**Undefined document**";
-    }
-
-    /**
-     * Metoda vraci data originách dokumentů
-     * @param docId index dokumentu
-     * @param len délka úryvku (0 = celý obsah)
-     * @return prvních len znaků
-     */
-    public String getDocPre(String docId, int len){
-        for (Document doc: sources) {
-            if(doc.getId().compareTo(docId)==0){
-                String text = doc.getText();
-                len = len > 0 && len < text.length() ? len : text.length() ;
-                return text.substring(0,len);
-            }
-        }
-        return  "**Undefine document**";
     }
 }
