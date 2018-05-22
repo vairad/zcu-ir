@@ -55,7 +55,8 @@ public class DocumentVector implements Serializable {
         }
 
         double size = vectorSize(tfidfValues) * vectorSize(otherTfIdf);
-        return (float)(scalarProduct/size);
+        float distance = (float)(scalarProduct/size);
+        return Float.isNaN(distance)? 0 : distance ;
     }
 
     /**
@@ -99,8 +100,8 @@ public class DocumentVector implements Serializable {
      */
     static double vectorSize(float[] vector){
         double size = 0.0;
-        for (double aVector : vector) {
-            size += aVector * aVector;
+        for (double element : vector) {
+            size += element * element;
         }
         size = Math.sqrt(size);
         return size;
