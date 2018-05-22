@@ -48,7 +48,7 @@ public class BooleanQuery {
      * @param list seznam kolekcí pro spojení
      * @return spojenoá kolekce
      */
-    private static Set<String> andMergeSets(List<Set<String>> list){
+    static Set<String> andMergeSets(List<Set<String>> list){
         Iterator<Set<String>> it = list.iterator();
         if(!it.hasNext()){
             return null;
@@ -65,7 +65,7 @@ public class BooleanQuery {
      * @param list seznam kolekcí pro spojení
      * @return spojená kolekce
      */
-    private static Set<String> orMergeSets(List<Set<String>> list){
+    static Set<String> orMergeSets(List<Set<String>> list){
         Iterator<Set<String>> it = list.iterator();
         if(!it.hasNext()){
             return null;
