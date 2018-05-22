@@ -13,6 +13,7 @@ import java.util.Set;
  * Třída představuje vektor dokumentu získaný výpočtem jiného modulu modulem evaluace.
  * Poskytuje metodu pro porovnání dvou vektorů.
  * Implementace uchovává sdílený slovnék pro překlad termů na id dokumentu.
+ * @author Radek Vais
  */
 public class DocumentVector implements Serializable {
 

@@ -9,40 +9,60 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Java FX kontrolér okna vyhledávání
+ * Obsahuje
+ *
+ * @author Radek Vais
+ */
 public class SearchControler implements Initializable {
 
-        @FXML
-        public VBox results;
-        @FXML
-        public Button button;
-        @FXML
-        private TextField field;
+    /**
+     * instance loggeru tridy
+     */
+    public static Logger logger = LogManager.getLogger(SearchControler.class.getName());
 
-        @FXML
-        private Label query;
+    @FXML
+    public VBox results;
+    @FXML
+    public Button button;
+    @FXML
+    private TextField field;
 
-        List<Result> resultHits;
+    @FXML
+    private Label query;
 
-        @FXML
-        private void handleAction(ActionEvent event) {
-            String text = field.getText();
-            query.setText(text);
-            button.setDisable(true);
-            Thread worker = new Thread(()->{
-                resultHits = SearchWindow.index.search(text);
-                Platform.runLater(this::publishResults);
-            });
-            worker.start();
-        }
+    List<Result> resultHits;
+
+    /**
+     * Metoda, která spustí vyhodnocení dotzu a zobrazí výsledky
+     *
+     * @param event
+     */
+    @FXML
+    private void actionSearch(ActionEvent event) {
+        String text = field.getText();
+        logger.debug("Passed query: "+text);
+        query.setText(text);
+        button.setDisable(true);
+        Thread worker = new Thread(() -> {
+            resultHits = SearchWindow.index.search(text);
+            Platform.runLater(this::publishResults);
+        });
+        worker.start();
+    }
 
     private void publishResults() {
+        logger.debug("Publishing results");
         results.getChildren().clear();
-        for(Result result: resultHits){
+        for (Result result : resultHits) {
             GuiResultImpl g = new GuiResultImpl(SearchWindow.index.getDocName(result.getDocumentID(), 50),
                     result.getScore(),
                     result.getDocumentID());
@@ -52,9 +72,8 @@ public class SearchControler implements Initializable {
     }
 
     @Override
-        public void initialize(URL url, ResourceBundle rb) {
-        }
-
+    public void initialize(URL url, ResourceBundle rb) {
+    }
 
 }
 

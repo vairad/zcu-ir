@@ -1,5 +1,8 @@
 package cz.zcu.kiv.nlp.ir.trec.gui;
 
+/**
+ * Přepravka pro hodnoty zobrazované v GUI.
+ */
 public class GuiResultImpl implements IGuiResult {
 
     String name;
@@ -17,11 +20,19 @@ public class GuiResultImpl implements IGuiResult {
         return name;
     }
 
+    /**
+     * Pole použito pro cosinové score dokumentu.
+     * @return score
+     */
     @Override
     public String getPresentQuery() {
         return score;
     }
 
+    /**
+     * Pole použito pro dokument ID
+     * @return docID
+     */
     @Override
     public String getMissingQuery() {
         return docID;

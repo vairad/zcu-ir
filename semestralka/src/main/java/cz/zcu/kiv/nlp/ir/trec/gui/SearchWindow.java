@@ -34,13 +34,18 @@ public class SearchWindow extends Application {
     /** java FX stage tohoto okna */
     private Stage stage;
 
-    SearchControler controller;
+    private SearchControler controller;
 
     private IndexSettings settingsWindow;
 
     public static Index index;
     private static boolean small;
 
+    /**
+     * Halvní metoda spouštějící JavaFX aplikaci.
+     * Připraví a zobrazí okno vyhledávání.
+     * @param primaryStage stage
+     */
     @Override
     public void start(Stage primaryStage) {
         logger.debug("Start");
@@ -60,6 +65,10 @@ public class SearchWindow extends Application {
 
     }
 
+    /**
+     * Metoda spustí náhvání indexu.
+     * A odkaz uloží do proměnné.
+     */
     private void loadIndex() {
         IPreprocessor preprocessor = new Preprocessor();
 
@@ -103,6 +112,9 @@ public class SearchWindow extends Application {
         logger.info("Indexing done");
     }
 
+    /**
+     * Metoda vyvolá okno pro nastavení indexování.
+     */
     private void showSetting() {
         Parent root;
         try {
@@ -124,6 +136,9 @@ public class SearchWindow extends Application {
         }
     }
 
+    /**
+     * Meotda načte resource searchWindow.fxml pro okno.
+     */
     private void loadView() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();

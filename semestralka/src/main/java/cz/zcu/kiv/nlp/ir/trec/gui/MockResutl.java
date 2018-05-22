@@ -1,5 +1,10 @@
 package cz.zcu.kiv.nlp.ir.trec.gui;
 
+
+/**
+ * Testovací třída pro vyplnění GUI
+ * @author Radek Vais
+ */
 public class MockResutl implements IGuiResult {
     @Override
     public String getDocumentName() {

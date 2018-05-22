@@ -7,6 +7,10 @@ import org.apache.logging.log4j.Logger;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Třída obalující resource bundle aplikace.
+ * @author Radek Vais
+ */
 public class Localization {
 
     private static Logger logger =	LogManager.getLogger(Localization.class.getName());

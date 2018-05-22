@@ -11,7 +11,7 @@
         <HBox spacing="8.0" alignment="CENTER">
             <children>
                 <TextField fx:id="field" prefWidth="200.0" />
-                <Button fx:id="button" onAction="#handleAction" text="Submit" />
+                <Button fx:id="button" onAction="#actionSearch" text="Submit" />
             </children>
         </HBox>
         <HBox>
