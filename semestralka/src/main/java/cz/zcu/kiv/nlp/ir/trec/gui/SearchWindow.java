@@ -22,6 +22,9 @@ import java.util.*;
 public class SearchWindow extends Application {
 
     public static void processGui(String[] args) {
+        List<String> agsList = Arrays.asList(args);
+        small = agsList.contains("-small");
+
         launch(args);
     }
 
@@ -36,6 +39,7 @@ public class SearchWindow extends Application {
     private IndexSettings settingsWindow;
 
     public static Index index;
+    private static boolean small;
 
     @Override
     public void start(Stage primaryStage) {
@@ -67,7 +71,7 @@ public class SearchWindow extends Application {
         ITokenizer tokenizer = new BasicTokenizer(stopWords);
 
         preprocessor.initialise(stemmer, tokenizer);
-        index = new Index(preprocessor);
+        index = new Index(preprocessor, small);
 
         List<Topic> topics = SerializedDataHelper.loadTopic(new File(TestTrecEval.OUTPUT_DIR + "/topicData.bin"));
 
@@ -90,7 +94,7 @@ public class SearchWindow extends Application {
         logger.info("Indexing");
         if( false && new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
             logger.info("Load saved index.");
-            index = new Index("indexFile", preprocessor);
+            index = new Index("indexFile", preprocessor, small);
         }else{
             logger.info("Index documents");
             index.index(documents);

@@ -29,6 +29,10 @@ public class TestTrecEval {
 
     public static void start(String args[]) {
 
+        List<String> agsList = Arrays.asList(args);
+        final boolean small = agsList.contains("-small");
+        final boolean notLoad = agsList.contains("-noLoad");
+
         IPreprocessor preprocessor = new Preprocessor();
 
         String [] stopFiles = {"stop-cz-dia-1.txt",
@@ -41,7 +45,7 @@ public class TestTrecEval {
         ITokenizer tokenizer = new BasicTokenizer(stopWords);
 
         preprocessor.initialise(stemmer, tokenizer);
-        Index index = new Index(preprocessor);
+        Index index = new Index(preprocessor, small);
 
         List<Topic> topics = SerializedDataHelper.loadTopic(new File(OUTPUT_DIR + "/topicData.bin"));
 
@@ -62,15 +66,15 @@ public class TestTrecEval {
         log.info("Documents: " + documents.size());
 
         log.info("Indexing");
-    //    if(new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
-     //       log.info("Load saved index.");
-     //       index = new Index("indexFile", preprocessor);
-     //   }else{
+        if(notLoad && new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
+            log.info("Load saved index.");
+            index = new Index("indexFile", preprocessor, small);
+        }else{
             log.info("Index documents");
             index.index(documents);
             log.info("Save index to disk");
             index.dumpIndex("indexFile");
-      //  }
+        }
 
         log.info("Indexing done");
 

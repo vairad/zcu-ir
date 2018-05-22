@@ -23,6 +23,7 @@ public class Index implements Indexer, Searcher {
 
     /** instance loggeru */
     private static Logger logger = LogManager.getLogger(Index.class.getName());
+    private final boolean small;
 
     private IPreprocessor preprocessor;
 
@@ -91,8 +92,8 @@ public class Index implements Indexer, Searcher {
      * @param filePattern cesta k uložení indexu.
      * @param preprocessor Instance preprocessingu, která se použije pro dotazování.
      */
-    public Index(String filePattern, IPreprocessor preprocessor){
-        this(preprocessor);
+    public Index(String filePattern, IPreprocessor preprocessor, boolean small){
+        this(preprocessor, small);
         loadIndex(filePattern);
     }
 
@@ -101,11 +102,12 @@ public class Index implements Indexer, Searcher {
      *
      * @param preprocessor Instance preprocessingu, která se použije pro tokenizování dokumentů a dotazů.
      */
-    public Index(IPreprocessor preprocessor){
+    public Index(IPreprocessor preprocessor, boolean small){
      //   logger.trace("Entry method");
         this.preprocessor = preprocessor;
         invertedIndex = new HashMap<>();
         queryIndex = new HashMap<>();
+        this.small = small;
     }
 
 
@@ -118,7 +120,9 @@ public class Index implements Indexer, Searcher {
         int count = 0;
         for (Document document: documents) {
             List<String> tokens = preprocessor.getProcessedForm(document.getTitle());
-         //   tokens.addAll(preprocessor.getProcessedForm(document.getText()));
+             if(!small){
+                 tokens.addAll(preprocessor.getProcessedForm(document.getText()));
+             }
             this.documents.put(document.getId(), tokens);
             addToInvertIndex(tokens, document.getId(), invertedIndex);
             count++;
@@ -350,7 +354,7 @@ public class Index implements Indexer, Searcher {
         if(tokenProperties == null){
             return new TreeSet<>();
         }
-        Set<String> allKeys = documents.keySet();
+        Set<String> allKeys = new TreeSet<>(documents.keySet());
         allKeys.removeAll(tokenProperties.getPostings().keySet());
         return allKeys;
     }
