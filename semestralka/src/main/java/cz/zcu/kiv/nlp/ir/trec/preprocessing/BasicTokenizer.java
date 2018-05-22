@@ -25,7 +25,6 @@ public class BasicTokenizer implements ITokenizer {
        // logger.trace("Entry method");
         this.stopwords = stopwords;
     }
-    //cislo |  | html | tecky a sracky
 
     private static List<String> tokenize(String text, String regex) {
         return Arrays.asList(text.split(regex));
@@ -35,13 +34,7 @@ public class BasicTokenizer implements ITokenizer {
     public List<String> getTokens(String text) {
       //  logger.trace("Entry method");
         List<String> results = tokenize(text, defaultRegex);
-        List<String> unMess = new LinkedList<>();
-        for (String result: unMess) {
-            unMess.add(result.replaceAll("\\.|,|(|)|#|&",""));
-        }
-
-
-        List<String> filtered = new ArrayList<>();
+        List<String> filtered = new LinkedList<>();
         if(stopwords != null){
             //logger.trace("Removing stopwords");
             for (String result: results) {

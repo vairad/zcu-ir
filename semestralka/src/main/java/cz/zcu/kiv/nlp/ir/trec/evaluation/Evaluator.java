@@ -1,9 +1,8 @@
 package cz.zcu.kiv.nlp.ir.trec.evaluation;
 
-import cz.zcu.kiv.nlp.ir.trec.index.TokenProperties;
-import cz.zcu.kiv.nlp.ir.trec.data.Document;
 import cz.zcu.kiv.nlp.ir.trec.data.Result;
 import cz.zcu.kiv.nlp.ir.trec.data.ResultImpl;
+import cz.zcu.kiv.nlp.ir.trec.index.TokenProperties;
 
 import java.util.*;
 
@@ -68,6 +67,9 @@ public class Evaluator {
 
     public static DocumentVector getDocumentVector(Map<String, TokenProperties> invertedIndex, String docId, List<String> docTokens, int documentCount) {
         DocumentVector dv = new DocumentVector(new float[invertedIndex.size()]);
+        if(docTokens == null){
+            return dv;
+        }
         for (String token : docTokens) {
             Map<String, Integer> postings = invertedIndex.get(token).getPostings();
             if (postings.containsKey(docId)) {

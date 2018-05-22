@@ -31,6 +31,8 @@ public class TestTrecEval {
         IPreprocessor preprocessor = new Preprocessor();
 
         String [] stopFiles = {"stop-cz-dia-1.txt",
+                                "stop-cz-dia-2.txt",
+                                "stop-cz-dia-3.txt",
                                 "stop-spec-chars.txt"};
         IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
 
@@ -59,15 +61,15 @@ public class TestTrecEval {
         log.info("Documents: " + documents.size());
 
         log.info("Indexing");
-        if(new File("indexFile.inv").exists()) {
-            log.info("Load saved index.");
-            index = new Index("indexFile", preprocessor);
-        }else{
+    //    if(new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
+     //       log.info("Load saved index.");
+     //       index = new Index("indexFile", preprocessor);
+     //   }else{
             log.info("Index documents");
             index.index(documents);
-         //   log.info("Save index to disk");
-         //   index.dumpIndex("indexFile");
-        }
+            log.info("Save index to disk");
+            index.dumpIndex("indexFile");
+      //  }
 
         log.info("Indexing done");
 

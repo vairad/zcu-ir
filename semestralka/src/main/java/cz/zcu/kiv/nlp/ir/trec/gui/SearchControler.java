@@ -1,5 +1,7 @@
 package cz.zcu.kiv.nlp.ir.trec.gui;
 
+import cz.zcu.kiv.nlp.ir.trec.data.Result;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -9,7 +11,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 public class SearchControler implements Initializable {
 
@@ -23,17 +27,35 @@ public class SearchControler implements Initializable {
         @FXML
         private Label query;
 
+        List<Result> resultHits;
+
         @FXML
         private void handleAction(ActionEvent event) {
             String text = field.getText();
             query.setText(text);
-            for(int i = 0; i < 10; i++){
-                    results.getChildren().add(new ResultControl(new MockResutl()));
-            }
+            button.setDisable(true);
+            Thread worker = new Thread(()->{
+                resultHits = SearchWindow.index.search(text);
+                Platform.runLater(this::publishResults);
+            });
+            worker.start();
         }
 
-        @Override
+    private void publishResults() {
+        results.getChildren().clear();
+        for(Result result: resultHits){
+            GuiResultImpl g = new GuiResultImpl(SearchWindow.index.getDocName(result.getDocumentID(), 20),
+                    result.getScore(),
+                    result.getDocumentID());
+            results.getChildren().add(new ResultControl(g));
+        }
+        button.setDisable(false);
+    }
+
+    @Override
         public void initialize(URL url, ResourceBundle rb) {
         }
+
+
 }
 

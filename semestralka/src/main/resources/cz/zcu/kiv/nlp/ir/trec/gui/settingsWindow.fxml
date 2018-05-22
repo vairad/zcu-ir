@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<BorderPane id="BorderPane" prefHeight="80.0" prefWidth="100" xmlns:fx="http://javafx.com/fxml" fx:controller="cz.zcu.kiv.nlp.ir.trec.gui.IndexSettings">
+  <top>
+    <VBox>
+        <HBox spacing="8.0" alignment="CENTER">
+            <children>
+                <Label>Settings of indexer properties.</Label>
+            </children>
+        </HBox>
+    </VBox>
+  </top>
+  <center>
+      <VBox>
+          <HBox spacing="8.0" alignment="CENTER">
+              <children>
+                  <Label>Agressive stemming:</Label>
+                  <ChoiceBox fx:id="agressiveCombo">
+                      <String fx:value="Yes"/>
+                      <String fx:value="No"/>
+                  </ChoiceBox>
+
+              </children>
+          </HBox>
+          <HBox spacing="8.0" alignment="CENTER">
+              <children>
+                  <Label>Advanced tokenizing:</Label>
+                  <ChoiceBox fx:id="advancedCombo">
+                      <String fx:value="Yes"/>
+                      <String fx:value="No"/>
+                  </ChoiceBox>
+              </children>
+          </HBox>
+          <HBox spacing="8.0" alignment="CENTER">
+              <children><Label>Stopword files:</Label>
+                  <Button fx:id="stopwords" onAction="#chooseStopWords" text="Choose Files" />
+              </children>
+          </HBox>
+          <HBox spacing="8.0" alignment="CENTER">
+              <children>
+                  <Label>Index directory:</Label>
+                  <Button fx:id="directory" onAction="#chooseIndexDirectory" text="Choose Directory" />
+              </children>
+          </HBox>
+          <HBox spacing="8.0" alignment="CENTER">
+              <children>
+                  <Button fx:id="submit" onAction="#prepareIndex" text="Prepare index" />
+              </children>
+          </HBox>
+
+      </VBox>
+  </center>
+</BorderPane>
+

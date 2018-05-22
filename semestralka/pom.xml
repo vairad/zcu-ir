@@ -72,7 +72,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>cz.zcu.kiv.nlp.ir.trec.TestTrecEval</mainClass>
+                            <mainClass>cz.zcu.kiv.nlp.ir.trec.MainClass</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

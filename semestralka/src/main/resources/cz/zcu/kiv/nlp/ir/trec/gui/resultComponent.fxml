@@ -10,11 +10,11 @@
          maxWidth="-Infinity"
          minHeight="-Infinity"
          minWidth="-Infinity"
-         spacing="8.0">
+         spacing="2.0">
 
         <Label fx:id="documentName"   styleClass="title"/>
         <Label fx:id="presentQuery" styleClass="presentWords"/>
         <Label fx:id="missingQuery" styleClass="missingWords"/>
-        <Label fx:id="preview" styleClass="preview"/>
+        <!--        <Label fx:id="preview" styleClass="preview"/> -->
         <Separator />
 </fx:root>

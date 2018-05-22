@@ -44,7 +44,7 @@ public class ResultControl extends VBox {
         this.documentName.setText(result.getDocumentName());
         this.presentQuery.setText(result.getPresentQuery());
         this.missingQuery.setText(result.getMissingQuery());
-        this.preview.setText(result.getPrewiev());
+   //     this.preview.setText(result.getPrewiev());
     }
 
     public void setDocumentName(String documentName) {

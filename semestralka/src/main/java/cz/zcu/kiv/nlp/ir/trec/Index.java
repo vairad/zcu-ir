@@ -28,28 +28,59 @@ public class Index implements Indexer, Searcher {
 
     int documentCount;
 
-    /** invertovaný index dokumentů
-     *
+    /**
+     * invertovaný index dokumentů
      * token : TokenProperties
      */
     private Map<String, TokenProperties> invertedIndex;
 
-    /** invertovaný index dotazu
-     *
+    /**
+     * invertovaný index dotazu
      * token : TokenProperties
      */
     private Map<String, TokenProperties> queryIndex;
 
+
+    /**
+     * Seznam dotazů obsahující slovo z pozitivní části dotazu
+     */
     private Set<String> connectedDocuments;
 
+    /**
+     * ID dokumentu dotazu
+     */
     private final String QUERY_DOCID = "QUERY";
 
+    /**
+     * In order index výskytu slov v dokumentu
+     *  dokument : slovo -> slovo -> slovo
+     */
     private Map<String, List<String>> documents;
 
-    private static volatile Semaphore semaphore = new Semaphore(1);
-    private static volatile Iterator<String> searchingIterator;
-    private static volatile PriorityQueue<ResultImpl> resultsQueue;
-    private static volatile DocumentVector queryVector;
+    /**
+     * Raw podoba načených dokumentů.
+     */
+    private List<Document> sources;
+
+    //synchronizace vláken ==============================================================
+    /**
+     * Ošetření kritické sekce přidělování dokumentů a ukládání výsledků
+     */
+    private volatile Semaphore semaphore = new Semaphore(1);
+
+    /**
+     * Seznam dokumentů pro přidělení vyhledávači.
+     */
+    private volatile Iterator<String> searchingIterator;
+    /**
+     * Fronta pro ukládání výsledků
+     */
+    private volatile PriorityQueue<ResultImpl> resultsQueue;
+
+    /**
+     * Vypočtený vektor tf-idf pro dokumenty v selectu
+     */
+    private volatile DocumentVector queryVector;
 
     /**
      * Konstruktor načte invertovný index z paměti.
@@ -60,7 +91,7 @@ public class Index implements Indexer, Searcher {
      * @param filePattern cesta k uložení indexu.
      * @param preprocessor Instance preprocessingu, která se použije pro dotazování.
      */
-    Index(String filePattern, IPreprocessor preprocessor){
+    public Index(String filePattern, IPreprocessor preprocessor){
         this(preprocessor);
         loadIndex(filePattern);
     }
@@ -70,7 +101,7 @@ public class Index implements Indexer, Searcher {
      *
      * @param preprocessor Instance preprocessingu, která se použije pro tokenizování dokumentů a dotazů.
      */
-    Index(IPreprocessor preprocessor){
+    public Index(IPreprocessor preprocessor){
      //   logger.trace("Entry method");
         this.preprocessor = preprocessor;
         invertedIndex = new HashMap<>();
@@ -83,9 +114,11 @@ public class Index implements Indexer, Searcher {
         logger.debug("Start indexing");
         documentCount = documents.size();
         this.documents = new HashMap<>();
+        this.sources = documents;
         int count = 0;
         for (Document document: documents) {
-            List<String> tokens = preprocessor.getProcessedForm(document.getText());
+            List<String> tokens = preprocessor.getProcessedForm(document.getTitle());
+         //   tokens.addAll(preprocessor.getProcessedForm(document.getText()));
             this.documents.put(document.getId(), tokens);
             addToInvertIndex(tokens, document.getId(), invertedIndex);
             count++;
@@ -136,11 +169,22 @@ public class Index implements Indexer, Searcher {
 
     @Override
     public List<Result> search(String query) {
+        prepareSearch();
         if (!query.contains("AND") && !query.contains("OR") && !query.contains("NOT")) {
             return searchOne(query);
         } else {
             return searchBoolean(query);
         }
+    }
+
+    /**
+     *  medtoda připraví objekty pro ukládání výsledků dotazů
+     *
+     */
+    private void prepareSearch() {
+        queryIndex = new HashMap<>();
+        connectedDocuments = new HashSet<>();
+        resultsQueue = new PriorityQueue<>(1, (o1, o2) -> -Float.compare(o1.getScore(), o2.getScore()));
     }
 
     /** Metoda slouží k vyhledání dokumentů dle boolean query a následnému vyhodnocení, který je nejvhodnější
@@ -154,10 +198,16 @@ public class Index implements Indexer, Searcher {
         //get DocumentVector of query
         queryVector = Evaluator.getQueryVector(queryIndex,invertedIndex,documentCount);
         searchingIterator = connectedDocuments.iterator();
+
         runParallelEvaluation();
+
+        return topXDocs(10);
+    }
+
+    private List<Result> topXDocs(int count) {
         LinkedList<Result> results = new LinkedList<>();
-        //prepare top 10 result
-        for (int i = 1; i < 11; i++) {
+        //prepare top count result
+        for (int i = 1; i < count+1; i++) {
             ResultImpl result = resultsQueue.poll();
             if(result == null){
                 break;
@@ -175,32 +225,23 @@ public class Index implements Indexer, Searcher {
      */
     private List<Result> searchOne(String query) {
         logger.debug("Single search");
+
         connectedDocuments = allConnectedDocuments(preprocessor.getProcessedForm(query));
         logger.debug("Founded "+connectedDocuments.size()+" related documents.");
 
        //get DocumentVector of query
         queryVector = Evaluator.getQueryVector(queryIndex,invertedIndex,documentCount);
         //rank documents against query by cosine distance
-        resultsQueue = new PriorityQueue<>(1, (o1, o2) -> -Float.compare(o1.getScore(), o2.getScore()));
 
         searchingIterator = connectedDocuments.iterator();
+
         runParallelEvaluation();
 
-        LinkedList<Result> results = new LinkedList<>();
-        //prepare top 10 result
-        for (int i = 1; i < 11; i++) {
-            ResultImpl result = resultsQueue.poll();
-            if(result == null){
-                break;
-            }
-            result.setRank(i);
-            results.addLast(result);
-        }
-        return results;
+        return topXDocs(10);
     }
 
     /**
-     * Metorda slouží ke spuštění parlelního výpočtu cosinové podobnosti nalezených dokumentů s query.
+     * Metoda slouží ke spuštění parlelního výpočtu cosinové podobnosti nalezených dokumentů s query.
      */
     private void runParallelEvaluation() {
 
@@ -262,7 +303,9 @@ public class Index implements Indexer, Searcher {
         } catch (InterruptedException e) {
             logger.error("Mutex problem", e);
         }
-        resultsQueue.add(result);
+        if(result != null) {
+            resultsQueue.add(result);
+        }
         semaphore.release();
     }
 
@@ -349,14 +392,23 @@ public class Index implements Indexer, Searcher {
     void dumpIndex(String filePattern)
     {
         String invertedPath = filePattern+".inv";
+        String indexPath = filePattern+".idx";
         try {
             logger.debug("Saving "+invertedPath);
             FileOutputStream fileOut = new FileOutputStream(invertedPath);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream((fileOut)));
             out.writeObject(invertedIndex);
             out.close();
             fileOut.close();
             logger.info("Inverted index saved into: "+invertedPath);
+
+            logger.debug("Saving "+indexPath);
+            fileOut = new FileOutputStream(indexPath);
+            out = new ObjectOutputStream(new BufferedOutputStream(fileOut));
+            out.writeObject(documents);
+            out.close();
+            fileOut.close();
+            logger.info("Document index saved into: "+indexPath);
 
         } catch (IOException exception) {
             logger.error("Problem with saving query");
@@ -374,19 +426,60 @@ public class Index implements Indexer, Searcher {
      * @param filePattern cesta/pattern
      */
     private void loadIndex(String filePattern) {
-        final Object object1;
+        final Object object1, object2;
         try {
             logger.debug("Loading "+filePattern+".inv");
             File invertFile = new File(filePattern+".inv");
 
-            final ObjectInputStream inverted = new ObjectInputStream(new FileInputStream(invertFile));
+            final ObjectInputStream inverted = new ObjectInputStream(new BufferedInputStream(new FileInputStream(invertFile)));
             object1 = inverted.readObject();
             inverted.close();
             invertedIndex = (Map<String, TokenProperties>) object1;
+
+            logger.debug("Loading "+filePattern+".idx");
+            File indexFile = new File(filePattern+".idx");
+            final ObjectInputStream index = new ObjectInputStream(new BufferedInputStream(new FileInputStream(indexFile)));
+            object2 = index.readObject();
+            index.close();
+            documents = (Map<String, List<String>>) object2;
 
         } catch (Exception ex) {
             logger.error("Problem with loading index", ex);
             throw new RuntimeException(ex);
         }
+    }
+
+    /**
+     * Metoda vrací data originálních dokumentů
+     * @param docId index dokumentu
+     * @param len délka úravku (0 = celý obsah)
+     * @return Titulek
+     */
+    public String getDocName(String docId, int len){
+        for (Document doc: sources) {
+            if(doc.getId().compareTo(docId)==0){
+                String text = doc.getTitle();
+                len = len > 0 && len < text.length() ? len : text.length() ;
+                return text.substring(0,len);
+            }
+        }
+        return  "**Undefined document**";
+    }
+
+    /**
+     * Metoda vraci data originách dokumentů
+     * @param docId index dokumentu
+     * @param len délka úryvku (0 = celý obsah)
+     * @return prvních len znaků
+     */
+    public String getDocPre(String docId, int len){
+        for (Document doc: sources) {
+            if(doc.getId().compareTo(docId)==0){
+                String text = doc.getText();
+                len = len > 0 && len < text.length() ? len : text.length() ;
+                return text.substring(0,len);
+            }
+        }
+        return  "**Undefine document**";
     }
 }
