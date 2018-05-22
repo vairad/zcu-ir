@@ -29,10 +29,12 @@ public class BooleanQuery {
             List<Set<String>> partialResults = new LinkedList<>();
 
             for (String singleQuery: queries) {
-                List<String> tokens = index.tokenQuery(singleQuery);
                 if(singleQuery.contains("NOT")){
+                    singleQuery = singleQuery.replaceAll("NOT", "");
+                    List<String> tokens = index.tokenQuery(singleQuery);
                     partialResults.add(index.allNotConnectedDocuments(tokens));
                 }else{
+                    List<String> tokens = index.tokenQuery(singleQuery);
                     partialResults.add(index.allConnectedDocuments(tokens));
                 }
             }

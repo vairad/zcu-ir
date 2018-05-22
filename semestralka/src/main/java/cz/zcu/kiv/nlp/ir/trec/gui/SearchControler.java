@@ -43,7 +43,7 @@ public class SearchControler implements Initializable {
     private void publishResults() {
         results.getChildren().clear();
         for(Result result: resultHits){
-            GuiResultImpl g = new GuiResultImpl(SearchWindow.index.getDocName(result.getDocumentID(), 20),
+            GuiResultImpl g = new GuiResultImpl(SearchWindow.index.getDocName(result.getDocumentID(), 50),
                     result.getScore(),
                     result.getDocumentID());
             results.getChildren().add(new ResultControl(g));
