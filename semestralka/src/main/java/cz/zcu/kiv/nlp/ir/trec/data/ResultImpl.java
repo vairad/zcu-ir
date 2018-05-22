@@ -1,7 +1,5 @@
 package cz.zcu.kiv.nlp.ir.trec.data;
 
-import java.util.Objects;
-
 /**
  * Created by Tigi on 8.1.2015.
  */

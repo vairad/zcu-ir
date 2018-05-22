@@ -11,9 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class SearchControler implements Initializable {
 

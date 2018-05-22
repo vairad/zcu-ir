@@ -1,10 +1,10 @@
 package cz.zcu.kiv.nlp.ir.trec.gui;
 
 
-
-import cz.zcu.kiv.nlp.ir.trec.*;
+import cz.zcu.kiv.nlp.ir.trec.Index;
+import cz.zcu.kiv.nlp.ir.trec.SerializedDataHelper;
+import cz.zcu.kiv.nlp.ir.trec.TestTrecEval;
 import cz.zcu.kiv.nlp.ir.trec.data.Document;
-import cz.zcu.kiv.nlp.ir.trec.data.Result;
 import cz.zcu.kiv.nlp.ir.trec.data.Topic;
 import cz.zcu.kiv.nlp.ir.trec.preprocessing.*;
 import javafx.application.Application;
