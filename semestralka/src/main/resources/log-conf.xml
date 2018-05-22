@@ -9,19 +9,9 @@
 		<Property name="projectName">VaisrEngine</Property>
 
 		<Property name="baseLog">${projectName}${suffix}</Property> <!-- Jen do úrovně  INFO-->
-		<Property name="debugLog">${projectName}-debug${suffix}</Property> <!-- Jen do úrovně  DEBUG-->
-		<Property name="traceLog">${projectName}-trace${suffix}</Property> <!-- Jen do úrovně  ALL -->
+		<Property name="dumpLog">${projectName}-dump${suffix}</Property> <!-- Jen do úrovně  DEBUG-->
+		<Property name="guiLog">${projectName}-gui${suffix}</Property> <!-- Jen do úrovně  ALL-->
 
-		<Property name="guiLog">${projectName}-GUI${suffix}</Property> <!-- Jen do úrovně  ALL-->
-
-		<Property name="originalName">${projectName}-trace${suffix}</Property> <!-- Jen do úrovně  ALL -->
-
-
-		<Property name="sendMessages">${projectName}-send${suffix}</Property>
-		<Property name="receivedMessages">${projectName}-receive${suffix}</Property>
-		<Property name="messages">${projectName}-allMessages${suffix}</Property>
-
-		<Property name="xml-parser">${projectName}-xmlParser${suffix}</Property>
 	</Properties>
 
 	<Appenders>
@@ -45,21 +35,64 @@
 			<ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
 		</File>
 
-	</Appenders>
+        <File name="dump" filename="${logdir}/${dumpLog}" append="false">
+            <PatternLayout pattern="${pFormat}" />
+            <ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+        </File>
+
+
+    </Appenders>
 	<Loggers>
 
 		<Root level="ALL">
 			<AppenderRef ref="screen"/>
-			<AppenderRef ref="file"/>
+            <AppenderRef ref="dump"/>
 		</Root>
 
+        <!-- TrecEval logger -->
 		<Logger name="cz.zcu.kiv.nlp.ir.trec.TestTrecEval">
 			<AppenderRef ref="TrecEval"/>
 		</Logger>
 
+        <!-- GUI LOGGERS -->
 		<Logger name="cz.zcu.kiv.nlp.ir.trec.gui.SearchWindow">
 			<AppenderRef ref="gui"/>
 		</Logger>
+
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.gui.Localization">
+            <AppenderRef ref="gui"/>
+        </Logger>
+
+		<Logger name="cz.zcu.kiv.nlp.ir.trec.gui.ResultControl">
+			<AppenderRef ref="gui"/>
+		</Logger>
+
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.gui.SearchControler">
+            <AppenderRef ref="gui"/>
+        </Logger>
+
+        <!-- PREPROCESSING LOGGERS -->
+		<Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.AdvancedTokenizer">
+			<AppenderRef ref="file"/>
+		</Logger>
+		<Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.FileDictionary">
+			<AppenderRef ref="file"/>
+		</Logger>
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.Preprocessor">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.BasicTokenizer">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.CzechStemmerAgressive">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.CzechStemmerLight">
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="cz.zcu.kiv.nlp.ir.trec.preprocessing.Utils">
+            <AppenderRef ref="file"/>
+        </Logger>
 
 	</Loggers>
 </Configuration>
