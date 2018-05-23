@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -79,7 +80,7 @@ public class Index implements Indexer, Searcher {
     /**
      * Fronta pro ukládání výsledků
      */
-    private volatile PriorityQueue<ResultImpl> resultsQueue;
+    private volatile PriorityBlockingQueue<ResultImpl> resultsQueue;
 
     /**
      * Vypočtený vektor tf-idf pro dokumenty v selectu
@@ -191,7 +192,7 @@ public class Index implements Indexer, Searcher {
     private void prepareSearch() {
         queryIndex = new HashMap<>();
         connectedDocuments = new HashSet<>();
-        resultsQueue = new PriorityQueue<>(1, (o1, o2) -> -Float.compare(o1.getScore(), o2.getScore()));
+        resultsQueue = new PriorityBlockingQueue<>(1, (o1, o2) -> -Float.compare(o1.getScore(), o2.getScore()));
     }
 
     /** Metoda slouží k vyhledání dokumentů dle boolean query a následnému vyhodnocení, který je nejvhodnější

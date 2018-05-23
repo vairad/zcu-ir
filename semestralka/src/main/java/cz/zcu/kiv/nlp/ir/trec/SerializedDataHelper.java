@@ -39,7 +39,7 @@ public class SerializedDataHelper {
     public static void saveDocument(File outputFile, List<Document> data) {
         // save data
         try {
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(outputFile));
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
             objectOutputStream.writeObject(data);
             objectOutputStream.close();
         } catch (IOException e) {
@@ -67,7 +67,7 @@ public class SerializedDataHelper {
     public static void saveTopic(File outputFile, List<Topic> data) {
         // save data
         try {
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(outputFile));
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
             objectOutputStream.writeObject(data);
             objectOutputStream.close();
         } catch (IOException e) {
