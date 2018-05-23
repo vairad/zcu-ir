@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 /**
+ * Implementace fyhledávácího indexu.
  * @author Radek Vais
  */
 
@@ -23,11 +24,13 @@ public class Index implements Indexer, Searcher {
 
     /** instance loggeru */
     private static Logger logger = LogManager.getLogger(Index.class.getName());
+
+    /**Vlajka, zda má být použit malý index.     */
     private final boolean small;
 
     private IPreprocessor preprocessor;
 
-    int documentCount;
+    private int documentCount;
 
     /**
      * invertovaný index dokumentů
@@ -54,7 +57,7 @@ public class Index implements Indexer, Searcher {
 
     /**
      * In order index výskytu slov v dokumentu
-     *  dokument : slovo -> slovo -> slovo
+     *  dokument : slovo - slovo - slovo
      */
     private Map<String, List<String>> documents;
 
@@ -91,6 +94,7 @@ public class Index implements Indexer, Searcher {
      *
      * @param filePattern cesta k uložení indexu.
      * @param preprocessor Instance preprocessingu, která se použije pro dotazování.
+     * @param small vljka, zda má být použit kompletní či malý index (small = true - malý index z názvů)
      */
     public Index(String filePattern, IPreprocessor preprocessor, boolean small){
         this(preprocessor, small);
@@ -101,6 +105,7 @@ public class Index implements Indexer, Searcher {
      * Konstruktor vytvoří instanci Indexu připravenou k indexaci dokumentů.
      *
      * @param preprocessor Instance preprocessingu, která se použije pro tokenizování dokumentů a dotazů.
+     * @param small vlajka použití malého indexu.
      */
     public Index(IPreprocessor preprocessor, boolean small){
      //   logger.trace("Entry method");
@@ -144,6 +149,7 @@ public class Index implements Indexer, Searcher {
      *
      * @param tokens token pro zařzení.
      * @param docID id dokumentu, kde byl token nalezen.
+     * @param invertedIndex invertovaný index vyhledávače.
      */
     private void addToInvertIndex(List<String> tokens, String docID, Map<String,TokenProperties> invertedIndex) {
         for (String token: tokens) {
@@ -322,10 +328,9 @@ public class Index implements Indexer, Searcher {
      */
     public Set<String> allConnectedDocuments(List<String> tokens){
         Set<String> connectedDocuments = new TreeSet<>();
-        List<String> lookingFor = tokens;
-        addToQueryIndex(lookingFor);
+        addToQueryIndex(tokens);
         //find apropriet doccuments
-        for (String token :lookingFor) {
+        for (String token : tokens) {
             connectedDocuments.addAll(connectedDocuments(token));
         }
         return connectedDocuments;
@@ -376,10 +381,9 @@ public class Index implements Indexer, Searcher {
      */
     public Set<String> allNotConnectedDocuments(List<String> tokens) {
         Set<String> notConnectedDocuments = new TreeSet<>();
-        List<String> lookingFor = tokens;
 
         //find apropriet NOTdoccuments
-        for (String token :lookingFor) {
+        for (String token : tokens) {
             notConnectedDocuments.addAll(notConnectedDocuments(token));
         }
         return notConnectedDocuments;
