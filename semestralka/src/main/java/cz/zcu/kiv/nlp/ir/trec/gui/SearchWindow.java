@@ -50,7 +50,7 @@ public class SearchWindow extends Application {
         stage = primaryStage;
         Localization.loadResource(Locale.getDefault());
         loadView();
-        stage.setTitle("Search window");
+        stage.setTitle(Localization.getBundle().getString("headline"));
         stage.setMinHeight(Constants.MINH_SEARCH);
         stage.setMinWidth(Constants.MINW_SEARCH);
 

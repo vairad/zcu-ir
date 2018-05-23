@@ -11,12 +11,11 @@
         <HBox spacing="8.0" alignment="CENTER">
             <children>
                 <TextField fx:id="field" prefWidth="200.0"  onAction="#onEnter" />
-                <Button fx:id="button" onAction="#actionSearch" text="Submit" />
+                <Button fx:id="button" onAction="#actionSearch" text="%search" />
             </children>
         </HBox>
         <HBox>
-            <Label alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0">
-              Výsledky pro dotaz:
+            <Label alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" text="%results">
             </Label>
             <Label fx:id="query" alignment="CENTER" minHeight="16.0" minWidth="69.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
         </HBox>
