@@ -249,7 +249,7 @@ public class Index implements Indexer, Searcher {
 
         runParallelEvaluation();
 
-        return topXDocs(10);
+        return topXDocs(MainClass.getDocCount());
     }
 
     /**
@@ -439,7 +439,7 @@ public class Index implements Indexer, Searcher {
      *
      * @param filePattern cesta/pattern
      */
-    void dumpIndex(String filePattern)
+    public void dumpIndex(String filePattern)
     {
         String invertedPath = filePattern+".inv";
         String indexPath = filePattern+".idx";

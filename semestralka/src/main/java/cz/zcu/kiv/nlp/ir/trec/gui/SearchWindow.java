@@ -2,6 +2,7 @@ package cz.zcu.kiv.nlp.ir.trec.gui;
 
 
 import cz.zcu.kiv.nlp.ir.trec.Index;
+import cz.zcu.kiv.nlp.ir.trec.MainClass;
 import cz.zcu.kiv.nlp.ir.trec.SerializedDataHelper;
 import cz.zcu.kiv.nlp.ir.trec.TestTrecEval;
 import cz.zcu.kiv.nlp.ir.trec.data.Document;
@@ -22,9 +23,6 @@ import java.util.*;
 public class SearchWindow extends Application {
 
     public static void processGui(String[] args) {
-        List<String> agsList = Arrays.asList(args);
-        small = agsList.contains("-small");
-
         launch(args);
     }
 
@@ -39,7 +37,6 @@ public class SearchWindow extends Application {
     private IndexSettings settingsWindow;
 
     public static Index index;
-    private static boolean small;
 
     /**
      * Halvní metoda spouštějící JavaFX aplikaci.
@@ -70,17 +67,8 @@ public class SearchWindow extends Application {
      * A odkaz uloží do proměnné.
      */
     private void loadIndex() {
-        IPreprocessor preprocessor = new Preprocessor();
-
-        String [] stopFiles = {"stop-cz-dia-1.txt",
-                "stop-spec-chars.txt"};
-        IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
-
-        IStemmer stemmer = new CzechStemmerLight();
-        ITokenizer tokenizer = new BasicTokenizer(stopWords);
-
-        preprocessor.initialise(stemmer, tokenizer);
-        index = new Index(preprocessor, small);
+        IPreprocessor preprocessor = PreprocessorFactory.preparePreprocessor(false,false, MainClass.getStopFiles());
+        index = new Index(preprocessor, MainClass.isSmall());
 
         List<Topic> topics = SerializedDataHelper.loadTopic(new File(TestTrecEval.OUTPUT_DIR + "/topicData.bin"));
 
@@ -101,12 +89,20 @@ public class SearchWindow extends Application {
         logger.info("Documents: " + documents.size());
 
         logger.info("Indexing");
-        if( false && new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
+        if(MainClass.isLoad()
+                && new File(MainClass.getIndexPath()+".inv").exists()
+                && new File(MainClass.getIndexPath()+".idx").exists())
+        {
             logger.info("Load saved index.");
-            index = new Index("indexFile", preprocessor, small);
+            index = new Index(MainClass.getIndexPath(), preprocessor, MainClass.isSmall());
         }else{
             logger.info("Index documents");
             index.index(documents);
+            if(MainClass.isSave()){
+                logger.info("Save index to disk");
+                index.dumpIndex(MainClass.getIndexPath());
+            }
+
         }
 
         logger.info("Indexing done");

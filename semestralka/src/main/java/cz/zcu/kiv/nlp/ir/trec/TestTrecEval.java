@@ -29,23 +29,8 @@ public class TestTrecEval {
 
     public static void start(String args[]) {
 
-        List<String> agsList = Arrays.asList(args);
-        final boolean small = agsList.contains("-small");
-        final boolean notLoad = agsList.contains("-noLoad");
-
-        IPreprocessor preprocessor = new Preprocessor();
-
-        String [] stopFiles = {"stop-cz-dia-1.txt",
-                                "stop-cz-dia-2.txt",
-                                "stop-cz-dia-3.txt",
-                                "stop-spec-chars.txt"};
-        IDictionary stopWords = new FileDictionary(Arrays.asList(stopFiles));
-
-        IStemmer stemmer = new CzechStemmerLight();
-        ITokenizer tokenizer = new BasicTokenizer(stopWords);
-
-        preprocessor.initialise(stemmer, tokenizer);
-        Index index = new Index(preprocessor, small);
+        IPreprocessor preprocessor = PreprocessorFactory.preparePreprocessor(false,false, MainClass.getStopFiles());
+        Index index = new Index(preprocessor, MainClass.isSmall());
 
         List<Topic> topics = SerializedDataHelper.loadTopic(new File(OUTPUT_DIR + "/topicData.bin"));
 
@@ -66,14 +51,20 @@ public class TestTrecEval {
         log.info("Documents: " + documents.size());
 
         log.info("Indexing");
-        if(notLoad && new File("indexFile.inv").exists() && new File("indexFile.idx").exists()) {
+        if(MainClass.isLoad()
+                && new File(MainClass.getIndexPath()+".inv").exists()
+                && new File(MainClass.getIndexPath()+".idx").exists())
+        {
             log.info("Load saved index.");
-            index = new Index("indexFile", preprocessor, small);
+            index = new Index(MainClass.getIndexPath(), preprocessor, MainClass.isSmall());
         }else{
             log.info("Index documents");
             index.index(documents);
-            log.info("Save index to disk");
-            index.dumpIndex("indexFile");
+            if(MainClass.isSave()){
+                log.info("Save index to disk");
+                index.dumpIndex(MainClass.getIndexPath());
+            }
+
         }
 
         log.info("Indexing done");
