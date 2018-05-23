@@ -9,9 +9,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Hlavní třída projektu spravuje nastavení spuštění programu.
+ * @author Radek Vais
+ */
 public class MainClass {
-
-
 
     /*Statický inicializační blok nastavující odkaz (proměnnou) na konfiguraci loggeru*/
     static{
@@ -140,6 +142,10 @@ public class MainClass {
         return resultCount;
     }
 
+    /**
+     * Metoda vrací seznam načítaných souborů stop words
+     * @return list stop words
+     */
     public static String[] getStopFiles() {
         String [] stopFiles = {"stop-cz-dia-1.txt",
                 "stop-cz-dia-2.txt",
