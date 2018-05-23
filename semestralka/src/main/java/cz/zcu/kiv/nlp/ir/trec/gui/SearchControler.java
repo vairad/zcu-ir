@@ -59,6 +59,9 @@ public class SearchControler implements Initializable {
         worker.start();
     }
 
+    /**
+     * Meotda pro odložený zápis výsledků do GUI
+     */
     private void publishResults() {
         logger.debug("Publishing results");
         results.getChildren().clear();
@@ -69,6 +72,15 @@ public class SearchControler implements Initializable {
             results.getChildren().add(new ResultControl(g));
         }
         button.setDisable(false);
+    }
+
+    /** Akce pro zachycení stisku enter ve vyhledávacím poli
+     *
+     * @param ae objekt události
+     */
+    @FXML
+    public void onEnter(ActionEvent ae){
+        actionSearch(ae);
     }
 
     @Override

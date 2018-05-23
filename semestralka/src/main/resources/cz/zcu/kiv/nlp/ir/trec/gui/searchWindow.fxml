@@ -10,7 +10,7 @@
     <VBox>
         <HBox spacing="8.0" alignment="CENTER">
             <children>
-                <TextField fx:id="field" prefWidth="200.0" />
+                <TextField fx:id="field" prefWidth="200.0"  onAction="#onEnter" />
                 <Button fx:id="button" onAction="#actionSearch" text="Submit" />
             </children>
         </HBox>
